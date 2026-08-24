@@ -54,7 +54,7 @@ export function ProductCard({ product }: { product: ShopifyProduct }) {
       <Link
         to="/product/$handle"
         params={{ handle: p.handle }}
-        className="block overflow-hidden bg-card"
+        className="block overflow-hidden"
         aria-label={p.title}
       >
         <div className="relative aspect-[4/5] w-full overflow-hidden">
@@ -65,7 +65,7 @@ export function ProductCard({ product }: { product: ShopifyProduct }) {
                 alt={primary.altText ?? p.title}
                 loading="lazy"
                 decoding="async"
-                className={`absolute inset-0 h-full w-full object-cover transition-all duration-[1200ms] ease-[cubic-bezier(0.16,1,0.3,1)] group-hover:scale-[1.06] ${
+                className={`absolute inset-0 h-full w-full object-cover transition-all duration-[1200ms] ease-[cubic-bezier(0.16,1,0.3,1)] group-hover:scale-[1.04] ${
                   secondary ? "group-hover:opacity-0" : ""
                 }`}
               />
@@ -75,7 +75,7 @@ export function ProductCard({ product }: { product: ShopifyProduct }) {
                   alt={secondary.altText ?? `${p.title} alternate view`}
                   loading="lazy"
                   decoding="async"
-                  className="absolute inset-0 h-full w-full object-cover opacity-0 transition-all duration-[1200ms] ease-[cubic-bezier(0.16,1,0.3,1)] group-hover:scale-[1.06] group-hover:opacity-100"
+                  className="absolute inset-0 h-full w-full object-cover opacity-0 transition-all duration-[1200ms] ease-[cubic-bezier(0.16,1,0.3,1)] group-hover:scale-[1.04] group-hover:opacity-100"
                 />
               )}
             </>
@@ -86,31 +86,33 @@ export function ProductCard({ product }: { product: ShopifyProduct }) {
           )}
 
           {soldOut && (
-            <span className="label !text-foreground absolute top-3 left-3 border border-border bg-background/85 px-2.5 py-1.5">
-              Sold out
-            </span>
+            <span className="label !text-foreground absolute top-4 left-4">Sold out</span>
           )}
           {!soldOut && lowStock && (
-            <span className="label !text-foreground absolute top-3 left-3 border border-border bg-background/85 px-2.5 py-1.5">
+            <span className="label !text-foreground absolute top-4 left-4 opacity-0 transition-opacity duration-500 group-hover:opacity-100">
               Low stock
             </span>
           )}
         </div>
       </Link>
 
-      <div className="mt-4 flex items-start justify-between gap-3 border-t border-border/60 pt-3">
-        <div className="min-w-0">
-          <h3 className="truncate text-[0.8rem] tracking-tight uppercase">
-            <Link to="/product/$handle" params={{ handle: p.handle }}>
-              {p.title}
-            </Link>
-          </h3>
-          <p className="mt-1.5 text-[0.7rem] text-muted-foreground">
-            {formatMoney(p.priceRange.minVariantPrice.amount, p.priceRange.minVariantPrice.currencyCode)}
-          </p>
-        </div>
+      <div className="mt-5 flex items-baseline justify-between gap-4">
+        <h3 className="truncate text-[0.72rem] tracking-[0.18em] uppercase">
+          <Link to="/product/$handle" params={{ handle: p.handle }}>
+            {p.title}
+          </Link>
+        </h3>
+        <p className="shrink-0 text-[0.72rem] tracking-[0.14em] text-muted-foreground">
+          {formatMoney(
+            p.priceRange.minVariantPrice.amount,
+            p.priceRange.minVariantPrice.currencyCode,
+          )}
+        </p>
+      </div>
 
-        {!soldOut && (
+      {/* Secondary interaction stays hidden until hover / focus */}
+      {!soldOut && (
+        <div className="mt-2 opacity-0 transition-opacity duration-500 group-focus-within:opacity-100 group-hover:opacity-100 max-md:opacity-100">
           <button
             type="button"
             onClick={() => {
@@ -122,15 +124,15 @@ export function ProductCard({ product }: { product: ShopifyProduct }) {
               }
             }}
             disabled={isLoading || busy}
-            className="label shrink-0 transition-colors hover:!text-foreground"
+            className="nav-link"
           >
             {busy ? <Loader2 className="h-3 w-3 animate-spin" /> : quickAdd ? "Close" : "Quick add"}
           </button>
-        )}
-      </div>
+        </div>
+      )}
 
       {quickAdd && (
-        <div className="mt-3 flex flex-wrap gap-1.5">
+        <div className="mt-4 flex flex-wrap gap-1.5">
           {quickSizes.map((s) => {
             const variant = variantForSize(s);
             const available = variant?.availableForSale ?? false;
