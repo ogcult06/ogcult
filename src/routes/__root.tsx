@@ -11,7 +11,9 @@ import { useEffect, type ReactNode } from "react";
 
 import appCss from "../styles.css?url";
 import { reportLovableError } from "../lib/lovable-error-reporting";
-import { CartProvider } from "../lib/cart";
+import { CartDrawer } from "../components/cart-drawer";
+import { Toaster } from "../components/ui/sonner";
+import { useCartSync } from "../hooks/useCartSync";
 import { SiteHeader, SiteFooter } from "../components/site-chrome";
 
 function NotFoundComponent() {
@@ -132,15 +134,25 @@ function RootComponent() {
 
   return (
     <QueryClientProvider client={queryClient}>
-      <CartProvider>
-        <div className="grain" aria-hidden="true" />
-        <SiteHeader />
-        <main>
-          {/* Required: nested routes render here. Removing <Outlet /> breaks all child routes. */}
-          <Outlet />
-        </main>
-        <SiteFooter />
-      </CartProvider>
+      <AppShell />
     </QueryClientProvider>
+  );
+}
+
+function AppShell() {
+  useCartSync();
+
+  return (
+    <>
+      <div className="grain" aria-hidden="true" />
+      <SiteHeader />
+      <main>
+        {/* Required: nested routes render here. Removing <Outlet /> breaks all child routes. */}
+        <Outlet />
+      </main>
+      <SiteFooter />
+      <CartDrawer />
+      <Toaster position="top-center" />
+    </>
   );
 }

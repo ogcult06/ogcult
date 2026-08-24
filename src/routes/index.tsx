@@ -1,8 +1,11 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import hero from "@/assets/hero.jpg";
-import editorial from "@/assets/editorial.jpg";
+import { useQuery } from "@tanstack/react-query";
+import { useEffect, useRef, useState } from "react";
 import { Reveal } from "@/components/reveal";
-import { products, formatPrice } from "@/lib/products";
+import { ProductGrid } from "@/components/product-card";
+import { Newsletter } from "@/components/newsletter";
+import { productsQueryOptions } from "@/lib/shopify";
+import { brand, home, imagery, trustPoints } from "@/lib/site-content";
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -11,125 +14,183 @@ export const Route = createFileRoute("/")({
       {
         name: "description",
         content:
-          "OG CULT is a dark luxury streetwear label. Heavyweight cut-and-sew, limited runs, shipped worldwide. Vol. 01 Nightshift is live.",
+          "OG CULT is premium underground streetwear cut in limited runs. Built for the ones who don't follow. Vol. 01 Nightshift is live.",
       },
       { property: "og:title", content: "OG CULT — Underground Luxury Streetwear" },
       {
         property: "og:description",
-        content: "Dark luxury streetwear in limited runs. Vol. 01 Nightshift is live.",
+        content: "Premium underground streetwear in limited runs. Shop Vol. 01 Nightshift.",
       },
+      { property: "og:url", content: "/" },
     ],
+    links: [{ rel: "canonical", href: "/" }],
   }),
-  component: Home,
+  component: HomePage,
 });
 
-function Home() {
+function useParallax(strength = 0.18) {
+  const ref = useRef<HTMLDivElement | null>(null);
+  const [offset, setOffset] = useState(0);
+
+  useEffect(() => {
+    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+    let frame = 0;
+    const onScroll = () => {
+      if (frame) return;
+      frame = requestAnimationFrame(() => {
+        frame = 0;
+        const el = ref.current;
+        if (!el) return;
+        const rect = el.getBoundingClientRect();
+        if (rect.bottom < 0 || rect.top > window.innerHeight) return;
+        const progress = (rect.top + rect.height / 2 - window.innerHeight / 2) / window.innerHeight;
+        setOffset(progress * strength * 100);
+      });
+    };
+    onScroll();
+    window.addEventListener("scroll", onScroll, { passive: true });
+    return () => window.removeEventListener("scroll", onScroll);
+  }, [strength]);
+
+  return { ref, offset };
+}
+
+function HomePage() {
+  const { data, isLoading } = useQuery(productsQueryOptions());
+  const featured = (data ?? []).slice(0, 4);
+  const hero = useParallax(0.12);
+  const editorial = useParallax(0.2);
+
   return (
-    <div>
-      <section className="relative min-h-[100svh] w-full overflow-hidden">
-        <img
-          src={hero}
-          alt="Figure in oversized black techwear under a single light in an underground garage"
-          width={1600}
-          height={1920}
-          className="absolute inset-0 h-full w-full object-cover object-center opacity-80"
-        />
-        <div className="absolute inset-0 bg-gradient-to-b from-background/85 via-background/25 to-background" />
-        <div className="relative flex min-h-[100svh] flex-col justify-end px-5 pb-12 md:px-10 md:pb-16">
-          <p className="label mb-6">Vol. 01 — Nightshift</p>
-          <h1 className="display-xl">
-            OG
-            <br />
-            Cult
-          </h1>
-          <div className="mt-8 flex flex-col gap-6 border-t border-border/60 pt-8 md:flex-row md:items-end md:justify-between">
-            <p className="max-w-sm text-sm leading-relaxed text-muted-foreground">
-              Cut heavy. Dyed black. Made in runs small enough to disappear. Worn by people who were
-              never asking permission.
-            </p>
-            <Link to="/shop" className="btn-cult self-start">
-              Enter the drop
+    <>
+      {/* HERO */}
+      <section className="relative flex h-[100svh] min-h-[560px] items-end overflow-hidden">
+        <div ref={hero.ref} className="absolute inset-0">
+          <img
+            src={imagery.hero}
+            alt="OG CULT campaign — figure in an underground car park at night"
+            className="h-[115%] w-full object-cover object-center"
+            style={{ transform: `translate3d(0, ${hero.offset}px, 0) scale(1.02)` }}
+          />
+          <div className="absolute inset-0 bg-gradient-to-t from-background via-background/50 to-background/40" />
+        </div>
+
+        <div className="relative w-full px-5 pb-14 md:px-10 md:pb-20">
+          <p className="label">{home.heroSub}</p>
+          <h1 className="display-lg mt-6 max-w-[16ch]">{home.heroHeadline}</h1>
+          <div className="mt-10 flex flex-wrap gap-3">
+            <Link to="/shop" className="btn-cult">
+              Shop the drop
             </Link>
+            <Link to="/about" className="btn-ghost-cult">
+              Explore OG Cult
+            </Link>
+          </div>
+          <div className="mt-14 flex items-center gap-4">
+            <span className="label">Scroll</span>
+            <span className="h-px w-16 origin-left animate-pulse bg-border" />
           </div>
         </div>
       </section>
 
-      <div className="overflow-hidden border-y border-border/60 py-5">
+      {/* MARQUEE */}
+      <div className="overflow-hidden border-y border-border/60 py-4">
         <div className="marquee-track">
-          {[0, 1].map((k) => (
-            <span key={k} className="label !text-foreground/70 pr-10">
-              {"Nightshift Vol. 01 — Limited to 200 pieces — Worldwide shipping — ".repeat(3)}
+          {[0, 1].map((dup) => (
+            <span key={dup} className="flex shrink-0">
+              {home.marquee.map((m) => (
+                <span key={`${dup}-${m}`} className="label mx-6">
+                  {m} —
+                </span>
+              ))}
             </span>
           ))}
         </div>
       </div>
 
-      <section className="px-5 py-20 md:px-10 md:py-32">
-        <Reveal>
-          <p className="label">Selected pieces</p>
-          <h2 className="display-lg mt-4 max-w-3xl">The uniform</h2>
+      {/* NEW DROP */}
+      <section className="px-5 py-20 md:px-10 md:py-28">
+        <Reveal className="flex flex-wrap items-end justify-between gap-6">
+          <div>
+            <h2 className="display-lg">{home.dropTitle}</h2>
+            <p className="mt-5 text-sm text-muted-foreground">{home.dropSub}</p>
+          </div>
+          <Link to="/shop" className="label transition-colors hover:!text-foreground">
+            View all
+          </Link>
         </Reveal>
+        <Reveal className="mt-12" delay={80}>
+          <ProductGrid products={featured} isLoading={isLoading} />
+        </Reveal>
+      </section>
 
-        <div className="mt-14 grid grid-cols-1 gap-x-6 gap-y-16 sm:grid-cols-2 lg:grid-cols-3">
-          {products.slice(0, 3).map((product, i) => (
-            <Reveal key={product.handle} delay={i * 110}>
-              <Link
-                to="/product/$handle"
-                params={{ handle: product.handle }}
-                className="group block"
-              >
-                <div className="overflow-hidden bg-card">
-                  <img
-                    src={product.image}
-                    alt={product.title}
-                    loading="lazy"
-                    width={1024}
-                    height={1280}
-                    className="h-full w-full object-cover transition-transform duration-[1200ms] ease-[cubic-bezier(0.16,1,0.3,1)] group-hover:scale-105"
-                  />
-                </div>
-                <div className="mt-5 flex items-baseline justify-between border-t border-border/60 pt-4">
-                  <h3 className="text-base tracking-tight">{product.title}</h3>
-                  <span className="text-xs text-muted-foreground">{formatPrice(product.price)}</span>
-                </div>
-              </Link>
-            </Reveal>
+      {/* EDITORIAL CAMPAIGN */}
+      <section className="relative flex h-[85svh] min-h-[460px] items-center justify-center overflow-hidden">
+        <div ref={editorial.ref} className="absolute inset-0">
+          <img
+            src={imagery.editorial}
+            alt="OG CULT editorial campaign — figures on a rain-soaked street at night"
+            loading="lazy"
+            className="h-[120%] w-full object-cover"
+            style={{ transform: `translate3d(0, ${editorial.offset}px, 0)` }}
+          />
+          <div className="absolute inset-0 bg-background/55" />
+        </div>
+        <Reveal className="relative px-5 text-center">
+          <h2 className="display-lg max-w-[14ch]">{home.editorialHeadline}</h2>
+          <Link to="/shop" className="btn-ghost-cult mt-10">
+            Explore the collection
+          </Link>
+        </Reveal>
+      </section>
+
+      {/* TRUST */}
+      <section className="grid gap-8 border-b border-border/60 px-5 py-14 md:grid-cols-3 md:px-10">
+        {trustPoints.map((t) => (
+          <div key={t.title}>
+            <p className="label !text-foreground">{t.title}</p>
+            <p className="mt-3 text-xs leading-relaxed text-muted-foreground">{t.body}</p>
+          </div>
+        ))}
+      </section>
+
+      {/* INSTAGRAM */}
+      <section className="px-5 py-20 md:px-10 md:py-28">
+        <Reveal className="flex flex-wrap items-end justify-between gap-4">
+          <h2 className="display-lg">Follow the cult</h2>
+          <a
+            href={brand.socials[0]?.href ?? "https://instagram.com"}
+            target="_blank"
+            rel="noreferrer"
+            className="label transition-colors hover:!text-foreground"
+          >
+            {brand.instagramHandle}
+          </a>
+        </Reveal>
+        <div className="mt-10 grid grid-cols-2 gap-2 md:grid-cols-3 md:gap-3">
+          {imagery.instagram.map((src, i) => (
+            <a
+              key={src}
+              href={brand.socials[0]?.href ?? "https://instagram.com"}
+              target="_blank"
+              rel="noreferrer"
+              className="group relative block overflow-hidden"
+            >
+              <img
+                src={src}
+                alt={`OG CULT social post ${i + 1} — placeholder campaign image`}
+                loading="lazy"
+                className="aspect-square w-full object-cover transition-transform duration-[1200ms] ease-[cubic-bezier(0.16,1,0.3,1)] group-hover:scale-105"
+              />
+            </a>
           ))}
         </div>
       </section>
 
-      <section className="relative">
-        <img
-          src={editorial}
-          alt="Two figures in oversized black streetwear on a rain-soaked night street"
-          loading="lazy"
-          width={1600}
-          height={1008}
-          className="h-[70svh] w-full object-cover md:h-[90svh]"
-        />
-        <div className="absolute inset-0 bg-background/40" />
-        <div className="absolute inset-0 flex items-center justify-center px-5">
-          <Reveal className="text-center">
-            <h2 className="display-lg">Dressed for the dark</h2>
-            <p className="label mt-6">Campaign — shot on 35mm, 04:00</p>
-          </Reveal>
-        </div>
+      {/* NEWSLETTER */}
+      <section className="border-t border-border/60 px-5 py-20 md:px-10 md:py-28">
+        <Newsletter />
       </section>
-
-      <section className="grid grid-cols-1 gap-10 px-5 py-20 md:grid-cols-2 md:px-10 md:py-32">
-        <Reveal>
-          <h2 className="display-lg">Not for everyone</h2>
-        </Reveal>
-        <Reveal delay={120} className="space-y-6 self-end">
-          <p className="text-sm leading-relaxed text-muted-foreground">
-            OG CULT started as a private group chat trading fits nobody else understood. It became a
-            label with one rule: nothing goes out unless it would survive a decade of nights.
-          </p>
-          <Link to="/about" className="btn-ghost-cult">
-            The doctrine
-          </Link>
-        </Reveal>
-      </section>
-    </div>
+    </>
   );
 }

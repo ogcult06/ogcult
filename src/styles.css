@@ -44,23 +44,23 @@
 
 :root {
   --radius: 0px;
-  --background: oklch(0.06 0 0);
-  --foreground: oklch(0.96 0.002 260);
-  --card: oklch(0.1 0 0);
+  --background: oklch(0.05 0 0);
+  --foreground: oklch(0.951 0.008 90);
+  --card: oklch(0.176 0 0);
   --card-foreground: oklch(0.96 0.002 260);
   --popover: oklch(0.1 0 0);
   --popover-foreground: oklch(0.96 0.002 260);
   --primary: oklch(0.96 0.002 260);
   --primary-foreground: oklch(0.06 0 0);
-  --secondary: oklch(0.16 0 0);
+  --secondary: oklch(0.22 0 0);
   --secondary-foreground: oklch(0.96 0.002 260);
   --muted: oklch(0.14 0 0);
-  --muted-foreground: oklch(0.62 0.005 260);
+  --muted-foreground: oklch(0.63 0 0);
   --accent: oklch(0.2 0 0);
   --accent-foreground: oklch(0.96 0.002 260);
   --destructive: oklch(0.52 0.19 27);
   --destructive-foreground: oklch(0.96 0.002 260);
-  --border: oklch(0.24 0 0);
+  --border: oklch(0.235 0 0);
   --input: oklch(0.24 0 0);
   --ring: oklch(0.5 0 0);
   --blood: oklch(0.46 0.19 26);
@@ -74,6 +74,7 @@
 
   html {
     scroll-behavior: smooth;
+    overflow-x: hidden;
     -webkit-tap-highlight-color: transparent;
   }
 
