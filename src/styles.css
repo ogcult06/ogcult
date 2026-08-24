@@ -159,12 +159,59 @@
   font-size: clamp(2.5rem, 10vw, 7rem);
 }
 
+/* Hero headline — slightly smaller than display-lg with more breathing room */
+@utility display-hero {
+  font-family: var(--font-display);
+  text-transform: uppercase;
+  line-height: 0.95;
+  letter-spacing: -0.015em;
+  font-size: clamp(2.25rem, 7.6vw, 5.25rem);
+}
+
+/* Section headline — editorial, calmer than the hero */
+@utility display-md {
+  font-family: var(--font-display);
+  text-transform: uppercase;
+  line-height: 0.9;
+  letter-spacing: -0.02em;
+  font-size: clamp(2rem, 6vw, 4.25rem);
+}
+
 @utility label {
   font-family: var(--font-sans);
   text-transform: uppercase;
   letter-spacing: 0.32em;
   font-size: 0.625rem;
   color: var(--color-muted-foreground);
+}
+
+/* Minimal editorial nav link with an underline that draws in on hover */
+@utility nav-link {
+  position: relative;
+  font-family: var(--font-sans);
+  text-transform: uppercase;
+  letter-spacing: 0.26em;
+  font-size: 0.625rem;
+  color: var(--color-muted-foreground);
+  transition: color 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+  &::after {
+    content: "";
+    position: absolute;
+    left: 0;
+    bottom: -0.45rem;
+    height: 1px;
+    width: 100%;
+    background: currentColor;
+    transform: scaleX(0);
+    transform-origin: left;
+    transition: transform 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+  &:hover {
+    color: var(--color-foreground);
+    &::after {
+      transform: scaleX(1);
+    }
+  }
 }
 
 @utility marquee-track {
