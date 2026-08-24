@@ -7,9 +7,9 @@ import { Newsletter } from "@/components/newsletter";
 import { brand } from "@/lib/site-content";
 
 const primaryNav = [
-  { to: "/shop", label: "Shop", search: undefined },
+  { to: "/shop", label: "Shop", search: {} },
   { to: "/shop", label: "New Drop", search: { filter: "New Drop" } },
-  { to: "/about", label: "About", search: undefined },
+  { to: "/about", label: "About", search: {} },
 ] as const;
 
 export function SiteHeader() {

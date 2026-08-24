@@ -9,7 +9,7 @@ type ShopSearch = { filter?: string };
 
 export const Route = createFileRoute("/shop")({
   validateSearch: (search: Record<string, unknown>): ShopSearch => {
-    const filter = typeof search.filter === "string" ? search.filter : undefined;
+    const filter = typeof search['filter'] === "string" ? (search['filter'] as string) : undefined;
     return filter ? { filter } : {};
   },
   head: () => ({

@@ -11,7 +11,9 @@ import { useEffect, type ReactNode } from "react";
 
 import appCss from "../styles.css?url";
 import { reportLovableError } from "../lib/lovable-error-reporting";
-import { CartProvider } from "../lib/cart";
+import { CartDrawer } from "../components/cart-drawer";
+import { Toaster } from "../components/ui/sonner";
+import { useCartSync } from "../hooks/useCartSync";
 import { SiteHeader, SiteFooter } from "../components/site-chrome";
 
 function NotFoundComponent() {
