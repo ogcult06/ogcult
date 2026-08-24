@@ -1,142 +1,332 @@
-import { createFileRoute, Link, notFound } from "@tanstack/react-router";
-import { useState } from "react";
-import { Reveal } from "@/components/reveal";
-import { useCart } from "@/lib/cart";
-import { getProduct, products, formatPrice } from "@/lib/products";
+import { createFileRoute, Link } from "@tanstack/react-router";
+import { useQuery } from "@tanstack/react-query";
+import { useMemo, useState } from "react";
+import { Loader2, Minus, Plus } from "lucide-react";
+import { toast } from "sonner";
+import { useCartStore } from "@/stores/cartStore";
+import { formatMoney, productQueryOptions, sortSizes } from "@/lib/shopify";
 
 export const Route = createFileRoute("/product/$handle")({
-  loader: ({ params }) => {
-    const product = getProduct(params.handle);
-    if (!product) throw notFound();
-    return { product };
-  },
-  head: ({ loaderData }) => {
-    if (!loaderData) {
-      return { meta: [{ title: "Unavailable — OG CULT" }, { name: "robots", content: "noindex" }] };
-    }
-    const { product } = loaderData;
-    const title = `${product.title} — OG CULT`;
+  head: ({ params }) => {
+    const name = params.handle
+      .split("-")
+      .map((w) => w.charAt(0).toUpperCase() + w.slice(1))
+      .join(" ");
     return {
       meta: [
-        { title },
-        { name: "description", content: product.description.slice(0, 155) },
-        { property: "og:title", content: title },
-        { property: "og:description", content: product.description.slice(0, 155) },
+        { title: `${name} — OG CULT` },
+        {
+          name: "description",
+          content: `${name} by OG CULT. Limited-run underground streetwear. Sizes, stock and secure checkout handled by our store.`,
+        },
+        { property: "og:title", content: `${name} — OG CULT` },
+        { property: "og:description", content: `${name} — limited-run OG CULT garment.` },
+        { property: "og:type", content: "product" },
+        { property: "og:url", content: `/product/${params.handle}` },
       ],
+      links: [{ rel: "canonical", href: `/product/${params.handle}` }],
     };
   },
   component: ProductPage,
 });
 
 function ProductPage() {
-  const { product } = Route.useLoaderData();
-  const { add } = useCart();
-  const [size, setSize] = useState<string | null>(null);
-  const [added, setAdded] = useState(false);
+  const { handle } = Route.useParams();
+  const { data, isLoading } = useQuery(productQueryOptions(handle));
+  const addItem = useCartStore((s) => s.addItem);
+  const openDrawer = useCartStore((s) => s.openDrawer);
+  const cartLoading = useCartStore((s) => s.isLoading);
+  const getCheckoutUrl = useCartStore((s) => s.getCheckoutUrl);
 
-  const others = products.filter((p) => p.handle !== product.handle).slice(0, 3);
+  const [activeImage, setActiveImage] = useState(0);
+  const [zoom, setZoom] = useState(false);
+  const [size, setSize] = useState<string | null>(null);
+  const [color, setColor] = useState<string | null>(null);
+  const [qty, setQty] = useState(1);
+
+  const p = data?.node;
+  const variants = useMemo(() => p?.variants.edges.map((e) => e.node) ?? [], [p]);
+  const images = p?.images.edges ?? [];
+
+  const sizeOption = p?.options.find((o) => /size/i.test(o.name));
+  const colorOption = p?.options.find((o) => /colou?r/i.test(o.name));
+  const sizes = sizeOption ? sortSizes(sizeOption.values) : [];
+  const colors = colorOption?.values ?? [];
+
+  const activeColor = color ?? colors[0] ?? null;
+
+  const matchVariant = (s: string | null) =>
+    variants.find((v) => {
+      const okSize = s ? v.selectedOptions.some((o) => /size/i.test(o.name) && o.value === s) : true;
+      const okColor = activeColor
+        ? v.selectedOptions.some((o) => /colou?r/i.test(o.name) && o.value === activeColor)
+        : true;
+      return okSize && okColor;
+    });
+
+  const selectedVariant = sizes.length > 0 ? (size ? matchVariant(size) : undefined) : variants[0];
+  const requiresSize = sizes.length > 1;
+
+  const handleAdd = async () => {
+    if (!p) return;
+    if (requiresSize && !size) {
+      toast.error("Select a size first");
+      return;
+    }
+    const variant = selectedVariant;
+    if (!variant) return;
+    await addItem({
+      product: { node: p },
+      variantId: variant.id,
+      variantTitle: variant.title,
+      price: variant.price,
+      quantity: qty,
+      selectedOptions: variant.selectedOptions || [],
+    });
+    toast.success("Added to cart", { description: `${p.title} · ${variant.title}` });
+    openDrawer();
+  };
+
+  const handleBuyNow = async () => {
+    await handleAdd();
+    const url = getCheckoutUrl();
+    if (url) window.open(url, "_blank");
+  };
+
+  if (isLoading) {
+    return (
+      <div className="px-5 pt-28 pb-24 md:px-10 md:pt-36">
+        <div className="grid gap-8 lg:grid-cols-2">
+          <div className="aspect-[4/5] w-full animate-pulse bg-card" />
+          <div className="space-y-4">
+            <div className="h-10 w-2/3 animate-pulse bg-card" />
+            <div className="h-4 w-1/4 animate-pulse bg-card" />
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  if (!p) {
+    return (
+      <div className="flex min-h-[70svh] flex-col items-center justify-center gap-6 px-5 text-center">
+        <h1 className="display-lg">Not found</h1>
+        <p className="text-sm text-muted-foreground">This piece is no longer available.</p>
+        <Link to="/shop" className="btn-cult">
+          Back to shop
+        </Link>
+      </div>
+    );
+  }
+
+  const price = selectedVariant?.price ?? p.priceRange.minVariantPrice;
+  const soldOut = !p.availableForSale;
 
   return (
-    <div className="pt-20">
-      <div className="grid grid-cols-1 md:grid-cols-2">
-        <div className="bg-card">
-          <img
-            src={product.image}
-            alt={product.title}
-            width={1024}
-            height={1280}
-            className="h-full w-full object-cover"
-          />
-        </div>
+    <div className="pt-20 pb-28 md:pt-28">
+      <div className="grid lg:grid-cols-2">
+        {/* GALLERY */}
+        <div className="lg:sticky lg:top-24 lg:self-start">
+          <div
+            className="relative aspect-[4/5] w-full overflow-hidden bg-card"
+            onClick={() => setZoom((v) => !v)}
+            role="button"
+            tabIndex={0}
+            aria-label="Toggle image zoom"
+            onKeyDown={(e) => e.key === "Enter" && setZoom((v) => !v)}
+          >
+            {images[activeImage] && (
+              <img
+                src={images[activeImage]!.node.url}
+                alt={images[activeImage]!.node.altText ?? `${p.title} — view ${activeImage + 1}`}
+                className={`h-full w-full object-cover transition-transform duration-[900ms] ease-[cubic-bezier(0.16,1,0.3,1)] ${
+                  zoom ? "scale-[1.8] cursor-zoom-out" : "cursor-zoom-in"
+                }`}
+              />
+            )}
+          </div>
 
-        <div className="flex flex-col justify-center px-5 py-14 md:px-12 md:py-20">
-          <p className="label">{product.drop}</p>
-          <h1 className="mt-4 text-4xl md:text-6xl">{product.title}</h1>
-          <p className="mt-5 text-sm text-muted-foreground">{formatPrice(product.price)}</p>
-          <p className="mt-8 max-w-md text-sm leading-relaxed text-muted-foreground">
-            {product.description}
-          </p>
-
-          <div className="mt-10">
-            <p className="label">Size</p>
-            <div className="mt-4 flex flex-wrap gap-2">
-              {product.sizes.map((s) => (
+          {/* mobile swipeable strip */}
+          {images.length > 1 && (
+            <div className="mt-2 flex snap-x snap-mandatory gap-2 overflow-x-auto px-2 lg:px-0">
+              {images.map((img, i) => (
                 <button
-                  key={s}
+                  key={img.node.url}
                   type="button"
-                  disabled={product.soldOut}
                   onClick={() => {
-                    setSize(s);
-                    setAdded(false);
+                    setActiveImage(i);
+                    setZoom(false);
                   }}
-                  className={`border px-5 py-3 text-xs tracking-[0.2em] uppercase transition-colors disabled:opacity-30 ${
-                    size === s
-                      ? "border-foreground bg-foreground text-background"
-                      : "border-border hover:border-foreground"
+                  aria-label={`View image ${i + 1}`}
+                  aria-current={i === activeImage}
+                  className={`w-20 shrink-0 snap-start border transition-colors ${
+                    i === activeImage ? "border-foreground" : "border-transparent"
                   }`}
                 >
-                  {s}
+                  <img
+                    src={img.node.url}
+                    alt={img.node.altText ?? `${p.title} thumbnail ${i + 1}`}
+                    loading="lazy"
+                    className="aspect-[4/5] w-full object-cover"
+                  />
                 </button>
               ))}
             </div>
-          </div>
+          )}
+        </div>
 
-          <button
-            type="button"
-            disabled={product.soldOut || !size}
-            onClick={() => {
-              if (!size) return;
-              add(product.handle, size);
-              setAdded(true);
-            }}
-            className="btn-cult mt-10 w-full md:w-auto"
-          >
-            {product.soldOut ? "Sold out" : added ? "Added to bag" : size ? "Add to bag" : "Select a size"}
-          </button>
+        {/* INFO */}
+        <div className="px-5 pt-10 md:px-10 lg:pt-4">
+          <h1 className="font-display text-4xl uppercase md:text-6xl">{p.title}</h1>
+          <p className="mt-4 text-sm text-muted-foreground">
+            {formatMoney(price.amount, price.currencyCode)}
+          </p>
 
-          {added && (
-            <Link to="/cart" className="label mt-5 !text-foreground underline">
-              Go to bag
-            </Link>
+          {p.description && (
+            <p className="mt-8 max-w-prose text-sm leading-relaxed text-muted-foreground">
+              {p.description}
+            </p>
           )}
 
-          <ul className="mt-12 space-y-3 border-t border-border/60 pt-8">
-            {product.details.map((d) => (
-              <li key={d} className="text-xs tracking-wide text-muted-foreground">
-                — {d}
-              </li>
+          {colors.length > 0 && (
+            <div className="mt-10">
+              <p className="label">Color</p>
+              <div className="mt-4 flex flex-wrap gap-2">
+                {colors.map((c) => (
+                  <button
+                    key={c}
+                    type="button"
+                    onClick={() => setColor(c)}
+                    className={`border px-4 py-2.5 text-[0.65rem] tracking-[0.2em] uppercase transition-colors ${
+                      c === activeColor ? "border-foreground" : "border-border hover:border-foreground/60"
+                    }`}
+                  >
+                    {c}
+                  </button>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {sizes.length > 0 && (
+            <div className="mt-10">
+              <div className="flex items-center justify-between">
+                <p className="label">Size</p>
+                <Link to="/size-guide" className="label transition-colors hover:!text-foreground">
+                  Size guide
+                </Link>
+              </div>
+              <div className="mt-4 flex flex-wrap gap-2">
+                {sizes.map((s) => {
+                  const variant = matchVariant(s);
+                  const available = variant?.availableForSale ?? false;
+                  return (
+                    <button
+                      key={s}
+                      type="button"
+                      disabled={!available}
+                      onClick={() => setSize(s)}
+                      aria-pressed={size === s}
+                      className={`relative border px-5 py-3 text-[0.65rem] tracking-[0.2em] uppercase transition-colors ${
+                        size === s ? "border-foreground bg-secondary" : "border-border"
+                      } ${available ? "hover:border-foreground" : "cursor-not-allowed text-muted-foreground/40 line-through"}`}
+                    >
+                      {s}
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+          )}
+
+          <div className="mt-10">
+            <p className="label">Quantity</p>
+            <div className="mt-4 flex w-fit items-center border border-border">
+              <button
+                type="button"
+                aria-label="Decrease quantity"
+                onClick={() => setQty((q) => Math.max(1, q - 1))}
+                className="px-4 py-3"
+              >
+                <Minus className="h-3 w-3" />
+              </button>
+              <span className="px-4 text-xs">{qty}</span>
+              <button
+                type="button"
+                aria-label="Increase quantity"
+                onClick={() => setQty((q) => q + 1)}
+                className="px-4 py-3"
+              >
+                <Plus className="h-3 w-3" />
+              </button>
+            </div>
+          </div>
+
+          <div className="mt-10 hidden flex-col gap-3 md:flex">
+            <button
+              type="button"
+              onClick={handleAdd}
+              disabled={soldOut || cartLoading}
+              className="btn-cult w-full"
+            >
+              {cartLoading ? (
+                <Loader2 className="h-4 w-4 animate-spin" />
+              ) : soldOut ? (
+                "Sold out"
+              ) : (
+                "Add to cart"
+              )}
+            </button>
+            <button
+              type="button"
+              onClick={handleBuyNow}
+              disabled={soldOut || cartLoading}
+              className="btn-ghost-cult w-full"
+            >
+              Buy now
+            </button>
+          </div>
+
+          <dl className="mt-14 border-t border-border/60">
+            {[
+              {
+                t: "Product details",
+                d: p.description || "[Add product details in your store's product description.]",
+              },
+              { t: "Fabric", d: "[Add fabric composition and weight in your product description.]" },
+              { t: "Shipping", d: "Rates and delivery windows are shown at checkout." },
+              { t: "Returns", d: "See shipping & returns for the current policy." },
+            ].map((row) => (
+              <div key={row.t} className="border-b border-border/60 py-5">
+                <dt className="label !text-foreground">{row.t}</dt>
+                <dd className="mt-3 text-xs leading-relaxed text-muted-foreground">{row.d}</dd>
+              </div>
             ))}
-          </ul>
+          </dl>
         </div>
       </div>
 
-      <section className="px-5 py-20 md:px-10 md:py-28">
-        <Reveal>
-          <h2 className="display-lg">More</h2>
-        </Reveal>
-        <div className="mt-12 grid grid-cols-1 gap-x-6 gap-y-14 sm:grid-cols-2 lg:grid-cols-3">
-          {others.map((p, i) => (
-            <Reveal key={p.handle} delay={i * 100}>
-              <Link to="/product/$handle" params={{ handle: p.handle }} className="group block">
-                <div className="overflow-hidden bg-card">
-                  <img
-                    src={p.image}
-                    alt={p.title}
-                    loading="lazy"
-                    width={1024}
-                    height={1280}
-                    className="h-full w-full object-cover transition-transform duration-[1200ms] ease-[cubic-bezier(0.16,1,0.3,1)] group-hover:scale-105"
-                  />
-                </div>
-                <div className="mt-5 flex items-baseline justify-between border-t border-border/60 pt-4">
-                  <h3 className="text-base tracking-tight">{p.title}</h3>
-                  <span className="text-xs text-muted-foreground">{formatPrice(p.price)}</span>
-                </div>
-              </Link>
-            </Reveal>
-          ))}
+      {/* MOBILE STICKY PURCHASE */}
+      <div className="fixed inset-x-0 bottom-0 z-40 flex gap-2 border-t border-border bg-background/90 px-4 py-3 backdrop-blur-xl md:hidden">
+        <div className="flex flex-col justify-center pr-2">
+          <span className="label">{size ?? (requiresSize ? "Pick size" : "One size")}</span>
+          <span className="text-xs">{formatMoney(price.amount, price.currencyCode)}</span>
         </div>
-      </section>
+        <button
+          type="button"
+          onClick={handleAdd}
+          disabled={soldOut || cartLoading}
+          className="btn-cult flex-1 !px-4"
+        >
+          {cartLoading ? (
+            <Loader2 className="h-4 w-4 animate-spin" />
+          ) : soldOut ? (
+            "Sold out"
+          ) : (
+            "Add to cart"
+          )}
+        </button>
+      </div>
     </div>
   );
 }
