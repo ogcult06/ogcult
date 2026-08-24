@@ -15,7 +15,7 @@ export const Route = createFileRoute("/cart")({
       { name: "robots", content: "noindex" },
     ],
   }),
-  component: Cart;
+  component: Cart,
 });
 
 function Cart() {
