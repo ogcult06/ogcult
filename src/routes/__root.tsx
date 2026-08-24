@@ -134,15 +134,25 @@ function RootComponent() {
 
   return (
     <QueryClientProvider client={queryClient}>
-      <CartProvider>
-        <div className="grain" aria-hidden="true" />
-        <SiteHeader />
-        <main>
-          {/* Required: nested routes render here. Removing <Outlet /> breaks all child routes. */}
-          <Outlet />
-        </main>
-        <SiteFooter />
-      </CartProvider>
+      <AppShell />
     </QueryClientProvider>
+  );
+}
+
+function AppShell() {
+  useCartSync();
+
+  return (
+    <>
+      <div className="grain" aria-hidden="true" />
+      <SiteHeader />
+      <main>
+        {/* Required: nested routes render here. Removing <Outlet /> breaks all child routes. */}
+        <Outlet />
+      </main>
+      <SiteFooter />
+      <CartDrawer />
+      <Toaster position="top-center" />
+    </>
   );
 }
