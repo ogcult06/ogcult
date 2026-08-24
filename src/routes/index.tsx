@@ -72,21 +72,24 @@ function HomePage() {
             className="h-[115%] w-full object-cover object-center"
             style={{ transform: `translate3d(0, ${hero.offset}px, 0) scale(1.02)` }}
           />
-          <div className="absolute inset-0 bg-gradient-to-t from-background via-background/50 to-background/40" />
+          {/* Cinematic mood, but the campaign image stays readable */}
+          <div className="absolute inset-0 bg-background/20" />
+          {/* Gradient scrim behind the copy for legibility */}
+          <div className="absolute inset-x-0 bottom-0 h-[72%] bg-gradient-to-t from-background via-background/75 to-transparent" />
         </div>
 
-        <div className="relative w-full px-5 pb-14 md:px-10 md:pb-20">
+        <div className="relative w-full px-5 pb-16 md:px-10 md:pb-24">
           <p className="label">{home.heroSub}</p>
-          <h1 className="display-lg mt-6 max-w-[16ch]">{home.heroHeadline}</h1>
-          <div className="mt-10 flex flex-wrap gap-3">
+          <h1 className="display-hero mt-7 max-w-[15ch] md:max-w-[17ch]">{home.heroHeadline}</h1>
+          <div className="mt-11 flex flex-wrap items-center gap-x-8 gap-y-4">
             <Link to="/shop" className="btn-cult">
               Shop the drop
             </Link>
-            <Link to="/about" className="btn-ghost-cult">
+            <Link to="/about" className="nav-link !text-foreground/70">
               Explore OG Cult
             </Link>
           </div>
-          <div className="mt-14 flex items-center gap-4">
+          <div className="mt-16 flex items-center gap-4">
             <span className="label">Scroll</span>
             <span className="h-px w-16 origin-left animate-pulse bg-border" />
           </div>
@@ -94,7 +97,7 @@ function HomePage() {
       </section>
 
       {/* MARQUEE */}
-      <div className="overflow-hidden border-y border-border/60 py-4">
+      <div className="overflow-hidden border-b border-border/60 py-4">
         <div className="marquee-track">
           {[0, 1].map((dup) => (
             <span key={dup} className="flex shrink-0">
@@ -108,19 +111,22 @@ function HomePage() {
         </div>
       </div>
 
-      {/* NEW DROP */}
-      <section className="px-5 py-20 md:px-10 md:py-28">
-        <Reveal className="flex flex-wrap items-end justify-between gap-6">
-          <div>
-            <h2 className="display-lg">{home.dropTitle}</h2>
-            <p className="mt-5 text-sm text-muted-foreground">{home.dropSub}</p>
-          </div>
-          <Link to="/shop" className="label transition-colors hover:!text-foreground">
+      {/* HERO → PRODUCTS TRANSITION + NEW DROP */}
+      <section className="px-5 pt-32 pb-24 md:px-10 md:pt-56 md:pb-32">
+        <Reveal className="max-w-4xl">
+          <span className="block h-px w-14 bg-border" />
+          <h2 className="display-md mt-10">{home.dropTitle}</h2>
+          <p className="mt-7 max-w-md text-sm leading-relaxed tracking-[0.06em] text-muted-foreground uppercase">
+            {home.dropSub}
+          </p>
+        </Reveal>
+        <Reveal className="mt-20 md:mt-28" delay={80}>
+          <ProductGrid products={featured} isLoading={isLoading} emptyState="placeholder" />
+        </Reveal>
+        <Reveal className="mt-16 flex justify-center md:mt-20" delay={120}>
+          <Link to="/shop" className="nav-link">
             View all
           </Link>
-        </Reveal>
-        <Reveal className="mt-12" delay={80}>
-          <ProductGrid products={featured} isLoading={isLoading} />
         </Reveal>
       </section>
 

@@ -36,13 +36,17 @@ export function SiteHeader() {
   return (
     <>
       <header
-        className={`fixed inset-x-0 top-0 z-50 transition-all duration-500 ${
+        className={`fixed inset-x-0 top-0 z-50 transition-all duration-700 ease-[cubic-bezier(0.16,1,0.3,1)] ${
           scrolled || menuOpen
-            ? "border-b border-border/70 bg-background/70 backdrop-blur-xl"
-            : "border-b border-transparent bg-transparent"
+            ? "border-b border-border/70 bg-background/80 backdrop-blur-xl"
+            : "border-b border-transparent bg-gradient-to-b from-background/60 to-transparent"
         }`}
       >
-        <div className="grid grid-cols-3 items-center px-5 py-4 md:px-10">
+        <div
+          className={`grid grid-cols-3 items-center px-5 transition-[padding] duration-700 ease-[cubic-bezier(0.16,1,0.3,1)] md:px-10 ${
+            scrolled ? "py-3.5 md:py-4" : "py-5 md:py-7"
+          }`}
+        >
           {/* Left */}
           <div className="flex items-center gap-8">
             <button
@@ -50,27 +54,28 @@ export function SiteHeader() {
               aria-label={menuOpen ? "Close menu" : "Open menu"}
               aria-expanded={menuOpen}
               onClick={() => setMenuOpen((v) => !v)}
-              className="label !text-foreground md:hidden"
+              className="nav-link !text-foreground md:hidden"
             >
               {menuOpen ? "Close" : "Menu"}
             </button>
             <Link
               to="/"
-              className="font-display hidden text-lg tracking-[0.28em] uppercase md:block"
+              aria-label={`${brand.name} — home`}
+              className="font-display !text-foreground hidden text-xl leading-none tracking-[0.36em] uppercase transition-opacity duration-500 hover:opacity-70 md:block"
             >
               {brand.name}
             </Link>
           </div>
 
           {/* Center */}
-          <nav aria-label="Main" className="hidden justify-center gap-10 md:flex">
+          <nav aria-label="Main" className="hidden justify-center gap-12 md:flex">
             {primaryNav.map((item) => (
               <Link
                 key={item.label}
                 to={item.to}
                 search={item.search}
-                className="label transition-colors hover:!text-foreground"
-                activeProps={{ className: "label !text-foreground" }}
+                className="nav-link"
+                activeProps={{ className: "nav-link !text-foreground" }}
               >
                 {item.label}
               </Link>
@@ -78,10 +83,12 @@ export function SiteHeader() {
           </nav>
           <Link
             to="/"
-            className="font-display justify-self-center text-base tracking-[0.28em] uppercase md:hidden"
+            aria-label={`${brand.name} — home`}
+            className="font-display !text-foreground justify-self-center text-lg leading-none tracking-[0.32em] uppercase md:hidden"
           >
             {brand.name}
           </Link>
+
 
           {/* Right */}
           <div className="flex items-center justify-end gap-5 md:gap-7">
