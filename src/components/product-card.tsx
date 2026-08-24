@@ -161,21 +161,49 @@ export function ProductGrid({
   products,
   isLoading,
   columns = "four",
+  emptyState = "message",
 }: {
   products: ShopifyProduct[];
   isLoading?: boolean;
   columns?: "four" | "three";
+  /** "placeholder" keeps the layout intact and shows quiet editorial slots instead of a message. */
+  emptyState?: "message" | "placeholder";
 }) {
   const cols =
     columns === "four"
       ? "grid-cols-2 md:grid-cols-3 lg:grid-cols-4"
       : "grid-cols-2 md:grid-cols-3";
+  const grid = `grid gap-x-5 gap-y-14 md:gap-x-8 md:gap-y-20 ${cols}`;
 
   if (isLoading) {
     return (
-      <div className={`grid gap-x-3 gap-y-10 md:gap-x-6 ${cols}`}>
+      <div className={grid}>
         {Array.from({ length: 4 }).map((_, i) => (
-          <div key={i} className="aspect-[4/5] w-full animate-pulse bg-card" />
+          <div key={i} className="aspect-[4/5] w-full animate-pulse bg-muted/60" />
+        ))}
+      </div>
+    );
+  }
+
+  if (products.length === 0 && emptyState === "placeholder") {
+    // Graceful, campaign-appropriate empty state. Disappears automatically
+    // as soon as Shopify returns products.
+    return (
+      <div className={grid}>
+        {Array.from({ length: 4 }).map((_, i) => (
+          <div key={i}>
+            <div className="relative aspect-[4/5] w-full overflow-hidden bg-muted/40">
+              <span className="label absolute bottom-4 left-4">
+                {String(i + 1).padStart(2, "0")}
+              </span>
+            </div>
+            <div className="mt-5 flex items-baseline justify-between gap-4">
+              <span className="text-[0.72rem] tracking-[0.18em] text-muted-foreground uppercase">
+                Coming soon
+              </span>
+              <span className="h-px w-8 self-center bg-border" />
+            </div>
+          </div>
         ))}
       </div>
     );
@@ -184,16 +212,16 @@ export function ProductGrid({
   if (products.length === 0) {
     return (
       <div className="border-t border-border/60 py-20 text-center">
-        <p className="font-display text-3xl uppercase">No products found</p>
-        <p className="mt-4 text-xs text-muted-foreground">
-          Products are managed in Shopify — add one and it appears here automatically.
+        <p className="font-display text-3xl uppercase">Nothing here yet</p>
+        <p className="mt-4 text-xs tracking-[0.18em] text-muted-foreground uppercase">
+          New pieces land as soon as the next drop opens.
         </p>
       </div>
     );
   }
 
   return (
-    <div className={`grid gap-x-3 gap-y-12 md:gap-x-6 md:gap-y-16 ${cols}`}>
+    <div className={grid}>
       {products.map((product) => (
         <ProductCard key={product.node.id} product={product} />
       ))}
