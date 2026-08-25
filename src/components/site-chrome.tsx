@@ -61,7 +61,7 @@ export function SiteHeader() {
             <Link
               to="/"
               aria-label={`${brand.name} — home`}
-              className="font-display !text-foreground hidden text-xl leading-none tracking-[0.36em] uppercase transition-opacity duration-500 hover:opacity-70 md:block"
+              className="font-logo !text-foreground hidden text-2xl leading-none tracking-[0.18em] uppercase transition-opacity duration-500 hover:opacity-70 md:block"
             >
               {brand.name}
             </Link>
@@ -84,7 +84,7 @@ export function SiteHeader() {
           <Link
             to="/"
             aria-label={`${brand.name} — home`}
-            className="font-display !text-foreground justify-self-center text-lg leading-none tracking-[0.32em] uppercase md:hidden"
+            className="font-logo !text-foreground justify-self-center text-xl leading-none tracking-[0.16em] uppercase md:hidden"
           >
             {brand.name}
           </Link>
