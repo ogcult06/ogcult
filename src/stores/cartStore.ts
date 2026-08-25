@@ -14,9 +14,28 @@ export interface CartItem {
 
 const CART_QUERY = `
   query cart($id: ID!) {
-    cart(id: $id) { id totalQuantity }
+    cart(id: $id) {
+      id
+      totalQuantity
+      checkoutUrl
+      cost {
+        subtotalAmount { amount currencyCode }
+        totalAmount { amount currencyCode }
+        totalTaxAmount { amount currencyCode }
+      }
+      lines(first: 100) {
+        edges {
+          node {
+            id
+            quantity
+            merchandise { ... on ProductVariant { id } }
+          }
+        }
+      }
+    }
   }
 `;
+
 
 const CART_CREATE_MUTATION = `
   mutation cartCreate($input: CartInput!) {
