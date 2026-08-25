@@ -182,13 +182,21 @@ async function removeLineFromShopifyCart(
   return { success: true };
 }
 
+export interface CartCost {
+  subtotalAmount: { amount: string; currencyCode: string } | null;
+  totalAmount: { amount: string; currencyCode: string } | null;
+  totalTaxAmount: { amount: string; currencyCode: string } | null;
+}
+
 interface CartStore {
   items: CartItem[];
   cartId: string | null;
   checkoutUrl: string | null;
+  cost: CartCost | null;
   isLoading: boolean;
   isSyncing: boolean;
   isDrawerOpen: boolean;
+  pendingVariantIds: string[];
   openDrawer: () => void;
   closeDrawer: () => void;
   addItem: (item: Omit<CartItem, "lineId">) => Promise<void>;
@@ -205,12 +213,15 @@ export const useCartStore = create<CartStore>()(
       items: [],
       cartId: null,
       checkoutUrl: null,
+      cost: null,
       isLoading: false,
       isSyncing: false,
       isDrawerOpen: false,
+      pendingVariantIds: [],
 
       openDrawer: () => set({ isDrawerOpen: true }),
       closeDrawer: () => set({ isDrawerOpen: false }),
+
 
       addItem: async (item) => {
         const { items, cartId, clearCart } = get();
