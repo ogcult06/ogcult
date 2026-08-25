@@ -30,6 +30,26 @@ export const Route = createFileRoute("/product/$handle")({
   component: ProductPage,
 });
 
+/** Build a readable fabric line from Shopify product tags. */
+function fabricFromTags(tags: string[] | undefined): string {
+  if (!tags || tags.length === 0) {
+    return "See product description for fabric details.";
+  }
+  const find = (re: RegExp) => tags.find((t) => re.test(t));
+  const parts: string[] = [];
+  const gsm = find(/^(\d+)-GSM$/i);
+  if (gsm) parts.push(gsm.replace(/-/g, " "));
+  const fabric = find(/FRENCH[- ]?TERRY|COTTON|POLYESTER|FLEECE|JERSEY|JERSEY-KNIT/i);
+  if (fabric) parts.push(fabric.replace(/-/g, " ").toLowerCase().replace(/\b\w/g, (c) => c.toUpperCase()));
+  const print = find(/DTF|SCREEN[- ]?PRINT|EMBROIDERY/i);
+  if (print) parts.push(print.replace(/-/g, " "));
+  const fit = find(/OVERSIZED|SLIM|REGULAR|BOXY/i);
+  if (fit) parts.push(fit.replace(/-/g, " ").toLowerCase().replace(/\b\w/g, (c) => c.toUpperCase()) + " fit");
+  return parts.length
+    ? parts.join(" · ")
+    : "See product description for fabric details.";
+}
+
 function ProductPage() {
   const { handle } = Route.useParams();
   const { data, isLoading } = useQuery(productQueryOptions(handle));
