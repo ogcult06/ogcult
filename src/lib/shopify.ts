@@ -10,7 +10,7 @@ export interface ShopifyVariant {
   title: string;
   price: { amount: string; currencyCode: string };
   availableForSale: boolean;
-  quantityAvailable: number | null;
+  quantityAvailable?: number | null;
   selectedOptions: Array<{ name: string; value: string }>;
 }
 
@@ -49,7 +49,6 @@ const PRODUCT_FIELDS = `
         title
         price { amount currencyCode }
         availableForSale
-        quantityAvailable
         selectedOptions { name value }
       }
     }
