@@ -158,7 +158,8 @@ export const LOW_STOCK_THRESHOLD = 4;
 export function variantStockLabel(variant: ShopifyVariant | undefined) {
   if (!variant) return null;
   if (!variant.availableForSale) return "SOLD OUT";
-  if (variant.quantityAvailable !== null && variant.quantityAvailable <= LOW_STOCK_THRESHOLD) {
+  const qty = variant.quantityAvailable;
+  if (qty != null && qty <= LOW_STOCK_THRESHOLD) {
     return "LOW STOCK";
   }
   return null;
