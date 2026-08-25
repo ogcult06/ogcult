@@ -383,7 +383,7 @@ export const useCartStore = create<CartStore>()(
               if (!remote) return null;
               return { ...i, lineId: remote.lineId, quantity: remote.quantity };
             })
-            .filter((i): i is CartItem => i !== null);
+            .filter((i) => i !== null) as CartItem[];
 
           set({
             items: reconciled,
