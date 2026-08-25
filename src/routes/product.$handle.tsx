@@ -293,7 +293,7 @@ function ProductPage() {
                 t: "Product details",
                 d: p.description || "[Add product details in your store's product description.]",
               },
-              { t: "Fabric", d: "[Add fabric composition and weight in your product description.]" },
+              { t: "Fabric", d: fabricFromTags(p.tags) },
               { t: "Shipping", d: "Rates and delivery windows are shown at checkout." },
               { t: "Returns", d: "See shipping & returns for the current policy." },
             ].map((row) => (
