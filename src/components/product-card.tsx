@@ -25,7 +25,7 @@ export function ProductCard({ product }: { product: ShopifyProduct }) {
 
   const soldOut = !p.availableForSale;
   const lowStock = variants.some(
-    (v) => v.availableForSale && v.quantityAvailable !== null && v.quantityAvailable <= 4,
+    (v) => v.availableForSale && v.quantityAvailable != null && v.quantityAvailable <= 4,
   );
 
   const variantForSize = (size: string) =>
