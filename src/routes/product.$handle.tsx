@@ -24,7 +24,6 @@ export const Route = createFileRoute("/product/$handle")({
       node?.description?.slice(0, 155) ||
       `${name} by OG CULT. Limited-run underground streetwear. Sizes, stock and secure checkout handled by our store.`;
     const image = node?.images.edges[0]?.node.url;
-    const price = node?.priceRange?.minVariantPrice;
 
     const meta: Array<Record<string, string>> = [
       { title: `${name} — OG CULT` },
@@ -62,11 +61,6 @@ export const Route = createFileRoute("/product/$handle")({
                   ? "https://schema.org/InStock"
                   : "https://schema.org/OutOfStock",
               })),
-              ...(price
-                ? {
-                    aggregateRating: undefined,
-                  }
-                : {}),
             }),
           },
         ]
