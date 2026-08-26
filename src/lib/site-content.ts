@@ -89,48 +89,69 @@ export const sizeGuide = {
   note: "Measurements are taken flat and may vary by 1–2 cm between batches. Update these values to match your production spec sheet.",
 };
 
-/** Placeholder policies — replace with your final legal copy. */
+/** Store policies. Review the wording and adjust to match your operations. */
 export const policies = {
   shipping: [
     {
       title: "Shipping",
-      body: "[Add your shipping destinations, carriers and rates here. Rates are configured in Shopify and shown at checkout.]",
+      body: "We ship worldwide from our studio. Live rates and duties are calculated at checkout based on your destination, and every order is dispatched with tracked delivery.",
     },
     {
       title: "Processing time",
-      body: "[Add how long orders take to leave the studio before dispatch.]",
+      body: "Orders are picked, checked and packed within 1–2 working days. Orders placed on weekends or public holidays leave the studio on the next working day.",
     },
     {
       title: "Delivery",
-      body: "[Add delivery windows per region. Tracking is emailed automatically by Shopify once an order ships.]",
+      body: "India: 2–5 working days. Rest of world: 5–12 working days depending on customs. A tracking link is emailed automatically as soon as your parcel is scanned by the carrier.",
     },
     {
       title: "Returns",
-      body: "[Add your return window and conditions — unworn, tags attached, original packaging, etc.]",
+      body: "Returns are accepted within 14 days of delivery on items that are unworn and unwashed, with all tags and original packaging intact. Email us with your order number and we will send return instructions. Return shipping is paid by the customer unless the item is faulty.",
     },
     {
       title: "Exchanges",
-      body: "[Add whether size exchanges are offered and how to request one.]",
+      body: "Size exchanges are offered once per order, subject to stock. Email us within 14 days of delivery with your order number and the size you need, and we will reserve it while your return is in transit.",
     },
     {
       title: "Damaged items",
-      body: "[Add what a customer should do if an item arrives faulty, and the timeframe for reporting it.]",
+      body: "If an item arrives faulty or incorrect, email us within 7 days of delivery with your order number and photographs of the issue. We will arrange a replacement or a full refund, including shipping, at no cost to you.",
     },
   ],
   privacy: [
     {
       title: "What we collect",
-      body: "[Describe the data collected at checkout and via the newsletter. Orders and customer data are stored in Shopify.]",
+      body: "When you order we collect your name, email, phone number, shipping and billing address, and order contents. Payment card details are handled directly by our payment providers and never reach our servers. If you join the newsletter we store only your email address.",
     },
-    { title: "How we use it", body: "[Describe order fulfilment, support and marketing use.]" },
-    { title: "Third parties", body: "[List processors — Shopify, payment providers, fulfilment partners.]" },
-    { title: "Your rights", body: "[Describe access, correction and deletion requests, and how to contact you.]" },
+    {
+      title: "How we use it",
+      body: "Your data is used to process and deliver orders, provide customer support, prevent fraud, and — only with your consent — send occasional drop announcements. You can unsubscribe from marketing at any time using the link in any email.",
+    },
+    {
+      title: "Third parties",
+      body: "We share data only with the processors needed to run the store: Shopify (store, orders and customer records), our payment providers, and our shipping and fulfilment carriers. We never sell your personal data.",
+    },
+    {
+      title: "Your rights",
+      body: "You may request a copy of your data, ask us to correct it, or ask us to delete it, subject to the records we must legally keep for tax and accounting. Email us and we will respond within 30 days.",
+    },
   ],
   terms: [
-    { title: "Use of this site", body: "[Add your terms of use.]" },
-    { title: "Orders", body: "[Add order acceptance, pricing and cancellation terms.]" },
-    { title: "Intellectual property", body: "[Add ownership of brand assets and imagery.]" },
-    { title: "Liability", body: "[Add your limitation of liability wording.]" },
+    {
+      title: "Use of this site",
+      body: "By browsing or ordering from this site you agree to these terms. You may not misuse the site, attempt to disrupt it, or use it for unlawful purposes. We may update these terms at any time; the version published here is the one that applies.",
+    },
+    {
+      title: "Orders",
+      body: "All orders are subject to acceptance and stock availability. Prices are shown in the currency at checkout and include applicable taxes where stated. If an item is mispriced or unavailable we may cancel the order and refund you in full. Cancellation requests are honoured if the order has not yet been dispatched.",
+    },
+    {
+      title: "Intellectual property",
+      body: "The OG CULT name, logo, artwork, garment graphics, photography and site copy are our property and may not be copied, reproduced or resold without written permission.",
+    },
+    {
+      title: "Liability",
+      body: "To the extent permitted by law, our liability for any claim relating to an order is limited to the amount you paid for that order. We are not liable for indirect or consequential loss. Nothing here limits your statutory consumer rights.",
+    },
   ],
 };
 
