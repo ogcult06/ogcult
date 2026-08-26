@@ -16,6 +16,7 @@ import { Route as ContactRouteImport } from './routes/contact'
 import { Route as PrivacyRouteImport } from './routes/privacy'
 import { Route as ShippingReturnsRouteImport } from './routes/shipping-returns'
 import { Route as ShopRouteImport } from './routes/shop'
+import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.]xml'
 import { Route as SizeGuideRouteImport } from './routes/size-guide'
 import { Route as TermsRouteImport } from './routes/terms'
 import { Route as ProductHandleRouteImport } from './routes/product.$handle'
@@ -55,6 +56,11 @@ const ShopRoute = ShopRouteImport.update({
   path: '/shop',
   getParentRoute: () => rootRouteImport,
 } as any)
+const SitemapDotxmlRoute = SitemapDotxmlRouteImport.update({
+  id: '/sitemap.xml',
+  path: '/sitemap.xml',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const SizeGuideRoute = SizeGuideRouteImport.update({
   id: '/size-guide',
   path: '/size-guide',
@@ -79,6 +85,7 @@ export interface FileRoutesByFullPath {
   '/privacy': typeof PrivacyRoute
   '/shipping-returns': typeof ShippingReturnsRoute
   '/shop': typeof ShopRoute
+  '/sitemap.xml': typeof SitemapDotxmlRoute
   '/size-guide': typeof SizeGuideRoute
   '/terms': typeof TermsRoute
   '/product/$handle': typeof ProductHandleRoute
@@ -91,6 +98,7 @@ export interface FileRoutesByTo {
   '/privacy': typeof PrivacyRoute
   '/shipping-returns': typeof ShippingReturnsRoute
   '/shop': typeof ShopRoute
+  '/sitemap.xml': typeof SitemapDotxmlRoute
   '/size-guide': typeof SizeGuideRoute
   '/terms': typeof TermsRoute
   '/product/$handle': typeof ProductHandleRoute
@@ -104,6 +112,7 @@ export interface FileRoutesById {
   '/privacy': typeof PrivacyRoute
   '/shipping-returns': typeof ShippingReturnsRoute
   '/shop': typeof ShopRoute
+  '/sitemap.xml': typeof SitemapDotxmlRoute
   '/size-guide': typeof SizeGuideRoute
   '/terms': typeof TermsRoute
   '/product/$handle': typeof ProductHandleRoute
@@ -118,6 +127,7 @@ export interface FileRouteTypes {
     | '/privacy'
     | '/shipping-returns'
     | '/shop'
+    | '/sitemap.xml'
     | '/size-guide'
     | '/terms'
     | '/product/$handle'
@@ -130,6 +140,7 @@ export interface FileRouteTypes {
     | '/privacy'
     | '/shipping-returns'
     | '/shop'
+    | '/sitemap.xml'
     | '/size-guide'
     | '/terms'
     | '/product/$handle'
@@ -142,6 +153,7 @@ export interface FileRouteTypes {
     | '/privacy'
     | '/shipping-returns'
     | '/shop'
+    | '/sitemap.xml'
     | '/size-guide'
     | '/terms'
     | '/product/$handle'
@@ -155,6 +167,7 @@ export interface RootRouteChildren {
   PrivacyRoute: typeof PrivacyRoute
   ShippingReturnsRoute: typeof ShippingReturnsRoute
   ShopRoute: typeof ShopRoute
+  SitemapDotxmlRoute: typeof SitemapDotxmlRoute
   SizeGuideRoute: typeof SizeGuideRoute
   TermsRoute: typeof TermsRoute
   ProductHandleRoute: typeof ProductHandleRoute
@@ -211,6 +224,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ShopRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/sitemap.xml': {
+      id: '/sitemap.xml'
+      path: '/sitemap.xml'
+      fullPath: '/sitemap.xml'
+      preLoaderRoute: typeof SitemapDotxmlRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/size-guide': {
       id: '/size-guide'
       path: '/size-guide'
@@ -243,6 +263,7 @@ const rootRouteChildren: RootRouteChildren = {
   PrivacyRoute: PrivacyRoute,
   ShippingReturnsRoute: ShippingReturnsRoute,
   ShopRoute: ShopRoute,
+  SitemapDotxmlRoute: SitemapDotxmlRoute,
   SizeGuideRoute: SizeGuideRoute,
   TermsRoute: TermsRoute,
   ProductHandleRoute: ProductHandleRoute,
