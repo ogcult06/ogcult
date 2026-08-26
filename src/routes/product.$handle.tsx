@@ -6,25 +6,76 @@ import { toast } from "sonner";
 import { useCartStore } from "@/stores/cartStore";
 import { formatMoney, productQueryOptions, sortSizes } from "@/lib/shopify";
 
+const SITE_URL = "https://ogcult.store";
+
 export const Route = createFileRoute("/product/$handle")({
-  head: ({ params }) => {
-    const name = params.handle
-      .split("-")
-      .map((w) => w.charAt(0).toUpperCase() + w.slice(1))
-      .join(" ");
+  loader: ({ params, context }) =>
+    context.queryClient.ensureQueryData(productQueryOptions(params.handle)),
+  head: ({ params, loaderData }) => {
+    const node = loaderData?.node;
+    const name =
+      node?.title ??
+      params.handle
+        .split("-")
+        .map((w) => w.charAt(0).toUpperCase() + w.slice(1))
+        .join(" ");
+    const url = `${SITE_URL}/product/${params.handle}`;
+    const description =
+      node?.description?.slice(0, 155) ||
+      `${name} by OG CULT. Limited-run underground streetwear. Sizes, stock and secure checkout handled by our store.`;
+    const image = node?.images.edges[0]?.node.url;
+    const price = node?.priceRange?.minVariantPrice;
+
+    const meta: Array<Record<string, string>> = [
+      { title: `${name} — OG CULT` },
+      { name: "description", content: description },
+      { property: "og:title", content: `${name} — OG CULT` },
+      { property: "og:description", content: description },
+      { property: "og:type", content: "product" },
+      { property: "og:url", content: url },
+      { name: "twitter:card", content: "summary_large_image" },
+    ];
+    if (image) {
+      meta.push({ property: "og:image", content: image });
+      meta.push({ name: "twitter:image", content: image });
+    }
+
+    const scripts = node
+      ? [
+          {
+            type: "application/ld+json",
+            children: JSON.stringify({
+              "@context": "https://schema.org",
+              "@type": "Product",
+              name: node.title,
+              description: node.description || description,
+              image: node.images.edges.map((e) => e.node.url),
+              url,
+              brand: { "@type": "Brand", name: "OG CULT" },
+              offers: node.variants.edges.map((e) => ({
+                "@type": "Offer",
+                name: e.node.title,
+                url,
+                price: e.node.price.amount,
+                priceCurrency: e.node.price.currencyCode,
+                availability: e.node.availableForSale
+                  ? "https://schema.org/InStock"
+                  : "https://schema.org/OutOfStock",
+              })),
+              ...(price
+                ? {
+                    aggregateRating: undefined,
+                  }
+                : {}),
+            }),
+          },
+        ]
+      : undefined;
+
     return {
-      meta: [
-        { title: `${name} — OG CULT` },
-        {
-          name: "description",
-          content: `${name} by OG CULT. Limited-run underground streetwear. Sizes, stock and secure checkout handled by our store.`,
-        },
-        { property: "og:title", content: `${name} — OG CULT` },
-        { property: "og:description", content: `${name} — limited-run OG CULT garment.` },
-        { property: "og:type", content: "product" },
-        { property: "og:url", content: `/product/${params.handle}` },
-      ],
-      links: [{ rel: "canonical", href: `/product/${params.handle}` }],
+      meta,
+      links: [{ rel: "canonical", href: url }],
+      ...(scripts ? { scripts } : {}),
     };
   },
   component: ProductPage,
