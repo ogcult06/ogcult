@@ -1,5 +1,5 @@
 import { Link } from "@tanstack/react-router";
-import { useMemo, useState } from "react";
+import { useMemo, useRef, useState } from "react";
 import { Loader2 } from "lucide-react";
 import { toast } from "sonner";
 import { useCartStore } from "@/stores/cartStore";
@@ -9,13 +9,28 @@ export function ProductCard({ product }: { product: ShopifyProduct }) {
   const p = product.node;
   const images = p.images.edges;
   const primary = images[0]?.node;
-  const secondary = images[1]?.node;
   const variants = p.variants.edges.map((e) => e.node);
   const addItem = useCartStore((s) => s.addItem);
   const openDrawer = useCartStore((s) => s.openDrawer);
   const isLoading = useCartStore((s) => s.isLoading);
   const [quickAdd, setQuickAdd] = useState(false);
   const [busy, setBusy] = useState(false);
+
+  const cardGalleryRef = useRef<HTMLDivElement>(null);
+  const [activeCardImg, setActiveCardImg] = useState(0);
+
+  const scrollToCardImage = (i: number) => {
+    const el = cardGalleryRef.current;
+    if (!el) return;
+    el.scrollTo({ left: i * el.clientWidth, behavior: "smooth" });
+  };
+
+  const handleCardScroll = () => {
+    const el = cardGalleryRef.current;
+    if (!el || el.clientWidth === 0) return;
+    const i = Math.round(el.scrollLeft / el.clientWidth);
+    setActiveCardImg(Math.min(Math.max(i, 0), images.length - 1));
+  };
 
   const sizeOption = p.options.find((o) => /size/i.test(o.name));
   const quickSizes = useMemo(
