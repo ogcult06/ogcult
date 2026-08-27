@@ -114,6 +114,24 @@ function ProductPage() {
   const variants = useMemo(() => p?.variants.edges.map((e) => e.node) ?? [], [p]);
   const images = p?.images.edges ?? [];
 
+  const scrollToImage = (i: number) => {
+    const el = galleryRef.current;
+    if (!el) return;
+    el.scrollTo({ left: i * el.clientWidth, behavior: "smooth" });
+    setActiveImage(i);
+    setZoom(false);
+  };
+
+  const handleGalleryScroll = () => {
+    const el = galleryRef.current;
+    if (!el || el.clientWidth === 0) return;
+    const i = Math.round(el.scrollLeft / el.clientWidth);
+    setActiveImage((prev) => {
+      if (i !== prev) setZoom(false);
+      return Math.min(Math.max(i, 0), images.length - 1);
+    });
+  };
+
   const sizeOption = p?.options.find((o) => /size/i.test(o.name));
   const colorOption = p?.options.find((o) => /colou?r/i.test(o.name));
   const sizes = sizeOption ? sortSizes(sizeOption.values) : [];
