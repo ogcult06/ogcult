@@ -1,6 +1,6 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
-import { useMemo, useState } from "react";
+import { useMemo, useRef, useState } from "react";
 import { Loader2, Minus, Plus } from "lucide-react";
 import { toast } from "sonner";
 import { useCartStore } from "@/stores/cartStore";
@@ -103,6 +103,7 @@ function ProductPage() {
   const cartLoading = useCartStore((s) => s.isLoading);
   const getCheckoutUrl = useCartStore((s) => s.getCheckoutUrl);
 
+  const galleryRef = useRef<HTMLDivElement>(null);
   const [activeImage, setActiveImage] = useState(0);
   const [zoom, setZoom] = useState(false);
   const [size, setSize] = useState<string | null>(null);
