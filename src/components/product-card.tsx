@@ -1,5 +1,5 @@
 import { Link } from "@tanstack/react-router";
-import { useMemo, useState } from "react";
+import { useMemo, useRef, useState } from "react";
 import { Loader2 } from "lucide-react";
 import { toast } from "sonner";
 import { useCartStore } from "@/stores/cartStore";
@@ -9,13 +9,28 @@ export function ProductCard({ product }: { product: ShopifyProduct }) {
   const p = product.node;
   const images = p.images.edges;
   const primary = images[0]?.node;
-  const secondary = images[1]?.node;
   const variants = p.variants.edges.map((e) => e.node);
   const addItem = useCartStore((s) => s.addItem);
   const openDrawer = useCartStore((s) => s.openDrawer);
   const isLoading = useCartStore((s) => s.isLoading);
   const [quickAdd, setQuickAdd] = useState(false);
   const [busy, setBusy] = useState(false);
+
+  const cardGalleryRef = useRef<HTMLDivElement>(null);
+  const [activeCardImg, setActiveCardImg] = useState(0);
+
+  const scrollToCardImage = (i: number) => {
+    const el = cardGalleryRef.current;
+    if (!el) return;
+    el.scrollTo({ left: i * el.clientWidth, behavior: "smooth" });
+  };
+
+  const handleCardScroll = () => {
+    const el = cardGalleryRef.current;
+    if (!el || el.clientWidth === 0) return;
+    const i = Math.round(el.scrollLeft / el.clientWidth);
+    setActiveCardImg(Math.min(Math.max(i, 0), images.length - 1));
+  };
 
   const sizeOption = p.options.find((o) => /size/i.test(o.name));
   const quickSizes = useMemo(
@@ -51,39 +66,40 @@ export function ProductCard({ product }: { product: ShopifyProduct }) {
 
   return (
     <article className="group relative">
-      <Link
-        to="/product/$handle"
-        params={{ handle: p.handle }}
-        className="block overflow-hidden"
-        aria-label={p.title}
-      >
-        <div className="relative aspect-[4/5] w-full overflow-hidden">
-          {primary ? (
-            <>
-              <img
-                src={primary.url}
-                alt={primary.altText ?? p.title}
-                loading="lazy"
-                decoding="async"
-                className={`absolute inset-0 h-full w-full object-cover transition-all duration-[1200ms] ease-[cubic-bezier(0.16,1,0.3,1)] group-hover:scale-[1.04] ${
-                  secondary ? "group-hover:opacity-0" : ""
-                }`}
-              />
-              {secondary && (
-                <img
-                  src={secondary.url}
-                  alt={secondary.altText ?? `${p.title} alternate view`}
-                  loading="lazy"
-                  decoding="async"
-                  className="absolute inset-0 h-full w-full object-cover opacity-0 transition-all duration-[1200ms] ease-[cubic-bezier(0.16,1,0.3,1)] group-hover:scale-[1.04] group-hover:opacity-100"
-                />
-              )}
-            </>
-          ) : (
-            <div className="flex h-full w-full items-center justify-center bg-muted">
-              <span className="label">No image</span>
-            </div>
-          )}
+      <div className="relative">
+        <Link
+          to="/product/$handle"
+          params={{ handle: p.handle }}
+          className="block overflow-hidden"
+          aria-label={p.title}
+        >
+          <div
+            ref={cardGalleryRef}
+            onScroll={handleCardScroll}
+            className="flex aspect-[4/5] w-full snap-x snap-mandatory overflow-x-auto overscroll-x-contain bg-card [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
+          >
+            {primary ? (
+              images.map((img, i) => (
+                <div
+                  key={img.node.url}
+                  className="relative h-full w-full shrink-0 snap-center overflow-hidden"
+                >
+                  <img
+                    src={img.node.url}
+                    alt={img.node.altText ?? (i === 0 ? p.title : `${p.title} — view ${i + 1}`)}
+                    loading={i === 0 ? "eager" : "lazy"}
+                    decoding="async"
+                    draggable={false}
+                    className="h-full w-full object-cover transition-transform duration-[1200ms] ease-[cubic-bezier(0.16,1,0.3,1)] group-hover:scale-[1.04]"
+                  />
+                </div>
+              ))
+            ) : (
+              <div className="flex h-full w-full items-center justify-center bg-muted">
+                <span className="label">No image</span>
+              </div>
+            )}
+          </div>
 
           {soldOut && (
             <span className="label !text-foreground absolute top-4 left-4">Sold out</span>
@@ -93,8 +109,29 @@ export function ProductCard({ product }: { product: ShopifyProduct }) {
               Low stock
             </span>
           )}
-        </div>
-      </Link>
+        </Link>
+
+        {images.length > 1 && (
+          <div className="mt-3 flex items-center justify-center gap-1.5">
+            {images.map((img, i) => (
+              <button
+                key={img.node.url}
+                type="button"
+                onClick={(e) => {
+                  e.preventDefault();
+                  e.stopPropagation();
+                  scrollToCardImage(i);
+                }}
+                aria-label={`View image ${i + 1}`}
+                aria-current={i === activeCardImg}
+                className={`h-[3px] transition-all duration-300 ${
+                  i === activeCardImg ? "w-5 bg-foreground" : "w-2 bg-foreground/25"
+                }`}
+              />
+            ))}
+          </div>
+        )}
+      </div>
 
       <div className="mt-5 flex items-baseline justify-between gap-4">
         <h3 className="truncate text-[0.72rem] tracking-[0.18em] uppercase">
