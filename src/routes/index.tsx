@@ -79,7 +79,7 @@ function HomePage() {
         </div>
 
         <div className="relative w-full px-5 pb-16 md:px-10 md:pb-24">
-          <p className="label">{home.heroSub}</p>
+          
           <h1 className="display-hero mt-7 max-w-[15ch] md:max-w-[17ch]">{home.heroHeadline}</h1>
           <div className="mt-11 flex flex-wrap items-center gap-x-8 gap-y-4">
             <Link to="/shop" className="btn-cult">
