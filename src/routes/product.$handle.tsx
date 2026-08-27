@@ -192,39 +192,64 @@ function ProductPage() {
       <div className="grid lg:grid-cols-2">
         {/* GALLERY */}
         <div className="lg:sticky lg:top-24 lg:self-start">
+          {/* swipeable main gallery */}
           <div
-            className="relative aspect-[4/5] w-full overflow-hidden bg-card"
-            onClick={() => setZoom((v) => !v)}
-            role="button"
-            tabIndex={0}
-            aria-label="Toggle image zoom"
-            onKeyDown={(e) => e.key === "Enter" && setZoom((v) => !v)}
+            ref={galleryRef}
+            onScroll={handleGalleryScroll}
+            className="flex aspect-[4/5] w-full snap-x snap-mandatory overflow-x-auto overscroll-x-contain bg-card [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
           >
-            {images[activeImage] && (
-              <img
-                src={images[activeImage]!.node.url}
-                alt={images[activeImage]!.node.altText ?? `${p.title} — view ${activeImage + 1}`}
-                className={`h-full w-full object-cover transition-transform duration-[900ms] ease-[cubic-bezier(0.16,1,0.3,1)] ${
-                  zoom ? "scale-[1.8] cursor-zoom-out" : "cursor-zoom-in"
-                }`}
-              />
-            )}
+            {images.map((img, i) => (
+              <div
+                key={img.node.url}
+                className="relative h-full w-full shrink-0 snap-center overflow-hidden"
+                onClick={() => setZoom((v) => !v)}
+                role="button"
+                tabIndex={0}
+                aria-label="Toggle image zoom"
+                onKeyDown={(e) => e.key === "Enter" && setZoom((v) => !v)}
+              >
+                <img
+                  src={img.node.url}
+                  alt={img.node.altText ?? `${p.title} — view ${i + 1}`}
+                  loading={i === 0 ? "eager" : "lazy"}
+                  draggable={false}
+                  className={`h-full w-full object-cover transition-transform duration-[900ms] ease-[cubic-bezier(0.16,1,0.3,1)] ${
+                    zoom && i === activeImage ? "scale-[1.8] cursor-zoom-out" : "cursor-zoom-in"
+                  }`}
+                />
+              </div>
+            ))}
           </div>
 
-          {/* mobile swipeable strip */}
+          {/* progress dots */}
           {images.length > 1 && (
-            <div className="mt-2 flex snap-x snap-mandatory gap-2 overflow-x-auto px-2 lg:px-0">
+            <div className="mt-3 flex items-center justify-center gap-2">
               {images.map((img, i) => (
                 <button
                   key={img.node.url}
                   type="button"
-                  onClick={() => {
-                    setActiveImage(i);
-                    setZoom(false);
-                  }}
+                  onClick={() => scrollToImage(i)}
                   aria-label={`View image ${i + 1}`}
                   aria-current={i === activeImage}
-                  className={`w-20 shrink-0 snap-start border transition-colors ${
+                  className={`h-1 transition-all duration-300 ${
+                    i === activeImage ? "w-6 bg-foreground" : "w-2 bg-foreground/25"
+                  }`}
+                />
+              ))}
+            </div>
+          )}
+
+          {/* thumbnail strip */}
+          {images.length > 1 && (
+            <div className="mt-2 flex gap-2 overflow-x-auto px-2 lg:px-0">
+              {images.map((img, i) => (
+                <button
+                  key={img.node.url}
+                  type="button"
+                  onClick={() => scrollToImage(i)}
+                  aria-label={`View image ${i + 1}`}
+                  aria-current={i === activeImage}
+                  className={`w-20 shrink-0 border transition-colors ${
                     i === activeImage ? "border-foreground" : "border-transparent"
                   }`}
                 >
@@ -232,6 +257,7 @@ function ProductPage() {
                     src={img.node.url}
                     alt={img.node.altText ?? `${p.title} thumbnail ${i + 1}`}
                     loading="lazy"
+                    draggable={false}
                     className="aspect-[4/5] w-full object-cover"
                   />
                 </button>
