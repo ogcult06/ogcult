@@ -80,7 +80,7 @@ function HomePage() {
 
         <div className="relative w-full px-5 pb-16 md:px-10 md:pb-24">
           
-          <h1 className="display-hero mt-7 max-w-[15ch] md:max-w-[17ch]">{home.heroHeadline}</h1>
+          <h1 className="display-hero mt-7 max-w-[15ch] md:max-w-[17ch]" style={{ marginTop: 0 }}>{home.heroHeadline}</h1>
           <div className="mt-11 flex flex-wrap items-center gap-x-8 gap-y-4">
             <Link to="/shop" className="btn-cult">
               Shop the drop
