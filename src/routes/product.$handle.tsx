@@ -232,7 +232,7 @@ function ProductPage() {
                   alt={img.node.altText ?? `${p.title} — view ${i + 1}`}
                   loading={i === 0 ? "eager" : "lazy"}
                   draggable={false}
-                  className={`h-full w-full object-cover transition-transform duration-[900ms] ease-[cubic-bezier(0.16,1,0.3,1)] ${
+                  className={`h-full w-full object-contain transition-transform duration-[900ms] ease-[cubic-bezier(0.16,1,0.3,1)] ${
                     zoom && i === activeImage ? "scale-[1.8] cursor-zoom-out" : "cursor-zoom-in"
                   }`}
                 />
@@ -277,7 +277,7 @@ function ProductPage() {
                     alt={img.node.altText ?? `${p.title} thumbnail ${i + 1}`}
                     loading="lazy"
                     draggable={false}
-                    className="aspect-[4/5] w-full object-cover"
+                    className="aspect-[4/5] w-full bg-card object-contain"
                   />
                 </button>
               ))}

@@ -90,7 +90,7 @@ export function ProductCard({ product }: { product: ShopifyProduct }) {
                     loading={i === 0 ? "eager" : "lazy"}
                     decoding="async"
                     draggable={false}
-                    className="h-full w-full object-cover transition-transform duration-[1200ms] ease-[cubic-bezier(0.16,1,0.3,1)] group-hover:scale-[1.04]"
+                    className="h-full w-full object-contain transition-transform duration-[1200ms] ease-[cubic-bezier(0.16,1,0.3,1)] group-hover:scale-[1.04]"
                   />
                 </div>
               ))
