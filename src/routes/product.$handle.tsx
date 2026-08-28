@@ -277,7 +277,7 @@ function ProductPage() {
                     alt={img.node.altText ?? `${p.title} thumbnail ${i + 1}`}
                     loading="lazy"
                     draggable={false}
-                    className="aspect-[4/5] w-full object-cover"
+                    className="aspect-[4/5] w-full bg-card object-contain"
                   />
                 </button>
               ))}
