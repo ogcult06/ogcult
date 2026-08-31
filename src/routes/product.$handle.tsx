@@ -229,7 +229,7 @@ function ProductPage() {
               {images.map((img, i) => (
                 <div
                   key={img.node.url}
-                  className="relative h-full w-full shrink-0 snap-center overflow-hidden"
+                  className="relative h-full w-full min-w-0 shrink-0 basis-full snap-center overflow-hidden"
                   onClick={() => {
                     if (didDrag() || !canZoom) return;
                     setZoom((v) => !v);
