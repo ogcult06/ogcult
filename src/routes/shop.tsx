@@ -14,13 +14,13 @@ export const Route = createFileRoute("/shop")({
   },
   head: () => ({
     meta: [
-      { title: "Shop the Collection — OG CULT" },
+      { title: "Shop the OG Collection — OG CULT" },
       {
         name: "description",
         content:
           "Shop OG CULT: heavyweight tees, hoodies and outerwear cut in limited runs. Sizes and stock update live from our store.",
       },
-      { property: "og:title", content: "Shop the Collection — OG CULT" },
+      { property: "og:title", content: "Shop the OG Collection — OG CULT" },
       {
         property: "og:description",
         content: "Heavyweight streetwear in limited runs. Shop the OG CULT collection.",
@@ -40,7 +40,7 @@ function ShopPage() {
   return (
     <div className="px-5 pt-28 pb-24 md:px-10 md:pt-36">
       <Reveal>
-        <h1 className="display-lg">Shop the collection</h1>
+        <h1 className="display-lg">Shop the OG collection</h1>
       </Reveal>
 
       <nav

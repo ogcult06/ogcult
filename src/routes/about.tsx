@@ -67,7 +67,7 @@ function AboutPage() {
 
       <div className="mt-20 px-5 md:px-10">
         <Link to="/shop" className="btn-cult">
-          Shop the collection
+          Shop the OG collection
         </Link>
       </div>
     </div>
