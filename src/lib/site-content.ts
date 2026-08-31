@@ -157,7 +157,7 @@ export const policies = {
 
 export const shopFilters = [
   { label: "All", query: undefined },
-  { label: "T-Shirts", query: "product_type:t-shirt OR title:tee OR title:t-shirt" },
-  { label: "Hoodies", query: "product_type:hoodie OR title:hoodie OR title:hood" },
+  { label: "T-Shirts", query: "product_type:t-shirts OR product_type:t-shirt OR title:tee OR title:tees" },
+  { label: "Hoodies", query: "product_type:hoodies OR product_type:hoodie OR title:hoodie" },
   { label: "New Drop", query: "tag:new-drop OR tag:new" },
 ] as const;
