@@ -212,32 +212,63 @@ function ProductPage() {
         {/* GALLERY */}
         <div className="lg:sticky lg:top-24 lg:self-start">
           {/* swipeable main gallery */}
-          <div
-            ref={galleryRef}
-            onScroll={handleGalleryScroll}
-            className="flex aspect-[4/5] w-full snap-x snap-mandatory overflow-x-auto overscroll-x-contain bg-card [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
-          >
-            {images.map((img, i) => (
-              <div
-                key={img.node.url}
-                className="relative h-full w-full shrink-0 snap-center overflow-hidden"
-                onClick={() => setZoom((v) => !v)}
-                role="button"
-                tabIndex={0}
-                aria-label="Toggle image zoom"
-                onKeyDown={(e) => e.key === "Enter" && setZoom((v) => !v)}
-              >
-                <img
-                  src={img.node.url}
-                  alt={img.node.altText ?? `${p.title} — view ${i + 1}`}
-                  loading={i === 0 ? "eager" : "lazy"}
-                  draggable={false}
-                  className={`h-full w-full object-contain transition-transform duration-[900ms] ease-[cubic-bezier(0.16,1,0.3,1)] ${
-                    zoom && i === activeImage ? "scale-[1.8] cursor-zoom-out" : "cursor-zoom-in"
-                  }`}
-                />
-              </div>
-            ))}
+          <div className="group relative">
+            <div
+              ref={galleryRef}
+              onScroll={handleGalleryScroll}
+              {...dragHandlers}
+              className="flex aspect-[4/5] w-full cursor-grab snap-x snap-mandatory overflow-x-auto overscroll-x-contain bg-card touch-pan-y active:cursor-grabbing [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
+            >
+              {images.map((img, i) => (
+                <div
+                  key={img.node.url}
+                  className="relative h-full w-full shrink-0 snap-center overflow-hidden"
+                  onClick={() => {
+                    if (didDrag()) return;
+                    setZoom((v) => !v);
+                  }}
+                  role="button"
+                  tabIndex={0}
+                  aria-label="Toggle image zoom"
+                  onKeyDown={(e) => {
+                    if (e.key === "Enter") setZoom((v) => !v);
+                    if (e.key === "ArrowRight") scrollToImage(Math.min(i + 1, images.length - 1));
+                    if (e.key === "ArrowLeft") scrollToImage(Math.max(i - 1, 0));
+                  }}
+                >
+                  <img
+                    src={img.node.url}
+                    alt={img.node.altText ?? `${p.title} — view ${i + 1}`}
+                    loading={i === 0 ? "eager" : "lazy"}
+                    draggable={false}
+                    className={`h-full w-full object-contain transition-transform duration-[900ms] ease-[cubic-bezier(0.16,1,0.3,1)] ${
+                      zoom && i === activeImage ? "scale-[1.8] cursor-zoom-out" : "cursor-zoom-in"
+                    }`}
+                  />
+                </div>
+              ))}
+            </div>
+
+            {images.length > 1 && (
+              <>
+                <button
+                  type="button"
+                  aria-label="Previous image"
+                  onClick={() => scrollToImage(Math.max(activeImage - 1, 0))}
+                  className="absolute top-1/2 left-3 hidden h-11 w-11 -translate-y-1/2 items-center justify-center border border-foreground/20 bg-background/60 text-foreground backdrop-blur transition-opacity md:flex md:opacity-0 md:group-hover:opacity-100"
+                >
+                  ‹
+                </button>
+                <button
+                  type="button"
+                  aria-label="Next image"
+                  onClick={() => scrollToImage(Math.min(activeImage + 1, images.length - 1))}
+                  className="absolute top-1/2 right-3 hidden h-11 w-11 -translate-y-1/2 items-center justify-center border border-foreground/20 bg-background/60 text-foreground backdrop-blur transition-opacity md:flex md:opacity-0 md:group-hover:opacity-100"
+                >
+                  ›
+                </button>
+              </>
+            )}
           </div>
 
           {/* progress dots */}
