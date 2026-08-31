@@ -81,7 +81,7 @@ function HomePage() {
         <div className="relative w-full px-5 pb-16 md:px-10 md:pb-24">
           
           <h1 className="display-hero flex items-center gap-4 md:gap-6">
-            <span className="flex flex-col leading-[0.95] text-[0.62em]">
+            <span className="flex flex-col items-end text-right leading-[0.95] text-[0.62em]">
               <span>Wear</span>
               <span>Become</span>
             </span>
