@@ -104,6 +104,7 @@ function ProductPage() {
   const getCheckoutUrl = useCartStore((s) => s.getCheckoutUrl);
 
   const galleryRef = useRef<HTMLDivElement>(null);
+  const { dragHandlers, didDrag } = useDragScroll(galleryRef);
   const [activeImage, setActiveImage] = useState(0);
   const [zoom, setZoom] = useState(false);
   const [size, setSize] = useState<string | null>(null);
