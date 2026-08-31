@@ -108,6 +108,11 @@ function ProductPage() {
   const { dragHandlers, didDrag } = useDragScroll(galleryRef);
   const [activeImage, setActiveImage] = useState(0);
   const [zoom, setZoom] = useState(false);
+  // Zoom is a desktop-only affordance — on touch a tap made the image look cropped.
+  const [canZoom, setCanZoom] = useState(false);
+  useEffect(() => {
+    setCanZoom(window.matchMedia("(hover: hover) and (pointer: fine)").matches);
+  }, []);
   const [size, setSize] = useState<string | null>(null);
   const [color, setColor] = useState<string | null>(null);
   const [qty, setQty] = useState(1);
