@@ -41,7 +41,7 @@ const PRODUCT_FIELDS = `
   createdAt
   availableForSale
   priceRange { minVariantPrice { amount currencyCode } }
-  images(first: 5) { edges { node { url altText } } }
+  images(first: 20) { edges { node { url altText } } }
   variants(first: 25) {
     edges {
       node {
