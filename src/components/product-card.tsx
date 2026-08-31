@@ -72,11 +72,15 @@ export function ProductCard({ product }: { product: ShopifyProduct }) {
           params={{ handle: p.handle }}
           className="block overflow-hidden"
           aria-label={p.title}
+          onClick={(e) => {
+            if (didDrag()) e.preventDefault();
+          }}
         >
           <div
             ref={cardGalleryRef}
             onScroll={handleCardScroll}
-            className="flex aspect-[4/5] w-full snap-x snap-mandatory overflow-x-auto overscroll-x-contain bg-card [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
+            {...dragHandlers}
+            className="flex aspect-[4/5] w-full cursor-grab snap-x snap-mandatory overflow-x-auto overscroll-x-contain bg-card touch-pan-y active:cursor-grabbing [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
           >
             {primary ? (
               images.map((img, i) => (
