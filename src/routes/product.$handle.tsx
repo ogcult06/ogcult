@@ -227,6 +227,9 @@ function ProductPage() {
                   className="relative h-full w-full shrink-0 snap-center overflow-hidden"
                   onClick={() => {
                     if (didDrag()) return;
+                    // Zoom is a desktop-only affordance; on touch it made the
+                    // image look cropped after a normal tap.
+                    if (!window.matchMedia("(hover: hover) and (pointer: fine)").matches) return;
                     setZoom((v) => !v);
                   }}
                   role="button"
