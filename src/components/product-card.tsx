@@ -4,6 +4,7 @@ import { Loader2 } from "lucide-react";
 import { toast } from "sonner";
 import { useCartStore } from "@/stores/cartStore";
 import { formatMoney, sortSizes, variantStockLabel, type ShopifyProduct } from "@/lib/shopify";
+import { useDragScroll } from "@/hooks/use-drag-scroll";
 
 export function ProductCard({ product }: { product: ShopifyProduct }) {
   const p = product.node;
@@ -17,6 +18,7 @@ export function ProductCard({ product }: { product: ShopifyProduct }) {
   const [busy, setBusy] = useState(false);
 
   const cardGalleryRef = useRef<HTMLDivElement>(null);
+  const { dragHandlers, didDrag } = useDragScroll(cardGalleryRef);
   const [activeCardImg, setActiveCardImg] = useState(0);
 
   const scrollToCardImage = (i: number) => {
@@ -72,11 +74,15 @@ export function ProductCard({ product }: { product: ShopifyProduct }) {
           params={{ handle: p.handle }}
           className="block overflow-hidden"
           aria-label={p.title}
+          onClick={(e) => {
+            if (didDrag()) e.preventDefault();
+          }}
         >
           <div
             ref={cardGalleryRef}
             onScroll={handleCardScroll}
-            className="flex aspect-[4/5] w-full snap-x snap-mandatory overflow-x-auto overscroll-x-contain bg-card [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
+            {...dragHandlers}
+            className="flex aspect-[4/5] w-full cursor-grab snap-x snap-mandatory overflow-x-auto overscroll-x-contain bg-card touch-pan-y active:cursor-grabbing [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
           >
             {primary ? (
               images.map((img, i) => (
