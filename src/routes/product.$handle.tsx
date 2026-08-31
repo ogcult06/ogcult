@@ -217,7 +217,7 @@ function ProductPage() {
     <div className="pt-20 pb-28 md:pt-28">
       <div className="grid lg:grid-cols-2">
         {/* GALLERY */}
-        <div className="lg:sticky lg:top-24 lg:self-start">
+        <div className="min-w-0 lg:sticky lg:top-24 lg:self-start">
           {/* swipeable main gallery */}
           <div className="group relative">
             <div
