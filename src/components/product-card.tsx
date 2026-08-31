@@ -4,6 +4,7 @@ import { Loader2 } from "lucide-react";
 import { toast } from "sonner";
 import { useCartStore } from "@/stores/cartStore";
 import { formatMoney, sortSizes, variantStockLabel, type ShopifyProduct } from "@/lib/shopify";
+import { useDragScroll } from "@/hooks/use-drag-scroll";
 
 export function ProductCard({ product }: { product: ShopifyProduct }) {
   const p = product.node;
