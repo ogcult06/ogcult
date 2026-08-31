@@ -80,7 +80,15 @@ function HomePage() {
 
         <div className="relative w-full px-5 pb-16 md:px-10 md:pb-24">
           
-          <h1 className="display-hero max-w-[15ch] md:max-w-[17ch]">{home.heroHeadline}</h1>
+          <h1 className="display-hero flex items-center gap-4 md:gap-6">
+            <span className="flex flex-col leading-[0.85] text-[0.62em]">
+              <span>Wear</span>
+              <span>Become</span>
+            </span>
+            <span aria-hidden className="h-[1.15em] w-[3px] shrink-0 bg-foreground/70 md:w-[4px]" />
+            <span>OG</span>
+          </h1>
+
           <div className="mt-11 flex flex-wrap items-center gap-x-8 gap-y-4">
             <Link to="/shop" className="btn-cult">
               Shop the drop

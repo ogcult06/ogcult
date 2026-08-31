@@ -32,7 +32,7 @@ export const imagery = {
 };
 
 export const home = {
-  heroHeadline: "Built different",
+  heroHeadline: "Wear Become OG",
   heroSub: "Vol. 01 — Nightshift",
   dropTitle: "New drop",
   dropSub: "The latest from OG CULT.",
