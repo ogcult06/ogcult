@@ -1,6 +1,6 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
-import { useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { Loader2, Minus, Plus } from "lucide-react";
 import { toast } from "sonner";
 import { useCartStore } from "@/stores/cartStore";
@@ -108,6 +108,11 @@ function ProductPage() {
   const { dragHandlers, didDrag } = useDragScroll(galleryRef);
   const [activeImage, setActiveImage] = useState(0);
   const [zoom, setZoom] = useState(false);
+  // Zoom is a desktop-only affordance — on touch a tap made the image look cropped.
+  const [canZoom, setCanZoom] = useState(false);
+  useEffect(() => {
+    setCanZoom(window.matchMedia("(hover: hover) and (pointer: fine)").matches);
+  }, []);
   const [size, setSize] = useState<string | null>(null);
   const [color, setColor] = useState<string | null>(null);
   const [qty, setQty] = useState(1);
@@ -226,17 +231,14 @@ function ProductPage() {
                   key={img.node.url}
                   className="relative h-full w-full shrink-0 snap-center overflow-hidden"
                   onClick={() => {
-                    if (didDrag()) return;
-                    // Zoom is a desktop-only affordance; on touch it made the
-                    // image look cropped after a normal tap.
-                    if (!window.matchMedia("(hover: hover) and (pointer: fine)").matches) return;
+                    if (didDrag() || !canZoom) return;
                     setZoom((v) => !v);
                   }}
                   role="button"
                   tabIndex={0}
                   aria-label="Toggle image zoom"
                   onKeyDown={(e) => {
-                    if (e.key === "Enter") setZoom((v) => !v);
+                    if (e.key === "Enter" && canZoom) setZoom((v) => !v);
                     if (e.key === "ArrowRight") scrollToImage(Math.min(i + 1, images.length - 1));
                     if (e.key === "ArrowLeft") scrollToImage(Math.max(i - 1, 0));
                   }}
@@ -247,9 +249,14 @@ function ProductPage() {
                     loading={i === 0 ? "eager" : "lazy"}
                     draggable={false}
                     className={`h-full w-full object-contain transition-transform duration-[900ms] ease-[cubic-bezier(0.16,1,0.3,1)] ${
-                      zoom && i === activeImage ? "scale-[1.8] cursor-zoom-out" : "cursor-zoom-in"
+                      canZoom && zoom && i === activeImage
+                        ? "scale-[1.8] cursor-zoom-out"
+                        : canZoom
+                          ? "cursor-zoom-in"
+                          : ""
                     }`}
                   />
+
                 </div>
               ))}
             </div>
