@@ -217,7 +217,7 @@ function ProductPage() {
     <div className="pt-20 pb-28 md:pt-28">
       <div className="grid lg:grid-cols-2">
         {/* GALLERY */}
-        <div className="lg:sticky lg:top-24 lg:self-start">
+        <div className="min-w-0 lg:sticky lg:top-24 lg:self-start">
           {/* swipeable main gallery */}
           <div className="group relative">
             <div
@@ -229,7 +229,7 @@ function ProductPage() {
               {images.map((img, i) => (
                 <div
                   key={img.node.url}
-                  className="relative h-full w-full shrink-0 snap-center overflow-hidden"
+                  className="relative h-full w-full min-w-0 shrink-0 basis-full snap-center overflow-hidden"
                   onClick={() => {
                     if (didDrag() || !canZoom) return;
                     setZoom((v) => !v);
