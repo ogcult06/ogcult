@@ -17,6 +17,7 @@ export function ProductCard({ product }: { product: ShopifyProduct }) {
   const [busy, setBusy] = useState(false);
 
   const cardGalleryRef = useRef<HTMLDivElement>(null);
+  const { dragHandlers, didDrag } = useDragScroll(cardGalleryRef);
   const [activeCardImg, setActiveCardImg] = useState(0);
 
   const scrollToCardImage = (i: number) => {
