@@ -5,6 +5,7 @@ import { Loader2, Minus, Plus } from "lucide-react";
 import { toast } from "sonner";
 import { useCartStore } from "@/stores/cartStore";
 import { formatMoney, productQueryOptions, sortSizes } from "@/lib/shopify";
+import { useDragScroll } from "@/hooks/use-drag-scroll";
 
 const SITE_URL = "https://ogcult.store";
 
