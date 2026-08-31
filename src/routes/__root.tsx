@@ -81,7 +81,7 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
     meta: [
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
-      { title: "OG CULT — Underground Luxury Streetwear" },
+      { title: "Streetwear For The Originals" },
       {
         name: "description",
         content: "Dark luxury streetwear in limited runs. Vol. 01 Nightshift is live.",

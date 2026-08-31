@@ -10,7 +10,7 @@ import { brand, home, imagery, trustPoints } from "@/lib/site-content";
 export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
-      { title: "OG CULT — Underground Luxury Streetwear" },
+      { title: "Streetwear For The Originals" },
       {
         name: "description",
         content:
