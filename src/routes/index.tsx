@@ -57,7 +57,7 @@ function useParallax(strength = 0.18) {
 
 function HomePage() {
   const { data, isLoading } = useQuery(productsQueryOptions());
-  const featured = (data ?? []).slice(0, 4);
+  const featured = sortProductsForDisplay(data ?? []).slice(0, 4);
   const hero = useParallax(0.12);
   const editorial = useParallax(0.2);
 

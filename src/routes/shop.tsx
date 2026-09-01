@@ -66,7 +66,7 @@ function ShopPage() {
       </nav>
 
       <div className="mt-12">
-        <ProductGrid products={data ?? []} isLoading={isLoading} />
+        <ProductGrid products={sortProductsForDisplay(data ?? [])} isLoading={isLoading} />
       </div>
     </div>
   );
