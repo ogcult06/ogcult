@@ -4,7 +4,7 @@ import { useEffect, useRef, useState } from "react";
 import { Reveal } from "@/components/reveal";
 import { ProductGrid } from "@/components/product-card";
 import { Newsletter } from "@/components/newsletter";
-import { productsQueryOptions } from "@/lib/shopify";
+import { productsQueryOptions, sortProductsForDisplay } from "@/lib/shopify";
 import { brand, home, imagery, trustPoints } from "@/lib/site-content";
 
 export const Route = createFileRoute("/")({

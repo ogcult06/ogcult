@@ -2,7 +2,7 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { ProductGrid } from "@/components/product-card";
 import { Reveal } from "@/components/reveal";
-import { productsQueryOptions } from "@/lib/shopify";
+import { productsQueryOptions, sortProductsForDisplay } from "@/lib/shopify";
 import { shopFilters } from "@/lib/site-content";
 
 type ShopSearch = { filter?: string };

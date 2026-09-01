@@ -139,6 +139,28 @@ export function formatMoney(amount: string | number, currencyCode: string) {
   }
 }
 
+/**
+ * Manual display order for the core OG CULT T-shirts so the newest drop sits
+ * between the existing releases in the homepage and shop grids.
+ * Unlisted products fall back to createdAt (newest first).
+ */
+const DISPLAY_ORDER = ["og-tees", "rosed-og", "crowned-og"];
+
+export function sortProductsForDisplay<T extends { node: { handle: string; createdAt: string } }>(
+  products: T[],
+): T[] {
+  const indexOf = (handle: string) => {
+    const i = DISPLAY_ORDER.indexOf(handle);
+    return i === -1 ? Number.MAX_SAFE_INTEGER : i;
+  };
+  return [...products].sort((a, b) => {
+    const ia = indexOf(a.node.handle);
+    const ib = indexOf(b.node.handle);
+    if (ia !== ib) return ia - ib;
+    return new Date(b.node.createdAt).getTime() - new Date(a.node.createdAt).getTime();
+  });
+}
+
 /** Size option values across variants, in a sensible clothing order when possible. */
 const SIZE_ORDER = ["XXS", "XS", "S", "M", "L", "XL", "XXL", "XXXL", "2XL", "3XL"];
 
