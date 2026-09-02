@@ -144,7 +144,7 @@ export function formatMoney(amount: string | number, currencyCode: string) {
  * between the existing releases in the homepage and shop grids.
  * Unlisted products fall back to createdAt (newest first).
  */
-const DISPLAY_ORDER = ["og-tees", "og-tees-1", "rosed-og", "crowned-og"];
+const DISPLAY_ORDER = ["og-tees", "og-tees-1", "rosed-og", "crowned-og", "crowned-og-1"];
 
 export function sortProductsForDisplay<T extends { node: { handle: string; createdAt: string } }>(
   products: T[],
