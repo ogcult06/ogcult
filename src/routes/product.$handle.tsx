@@ -460,7 +460,7 @@ function ProductPage() {
       </div>
 
       {/* MOBILE STICKY PURCHASE */}
-      <div className="fixed inset-x-0 bottom-0 z-40 flex gap-2 border-t border-border bg-background/90 px-4 py-3 backdrop-blur-xl md:hidden">
+      <div className="fixed inset-x-0 bottom-2 z-40 flex gap-2 border-t border-border bg-background/90 px-4 py-3 backdrop-blur-xl md:hidden">
         <div className="flex flex-col justify-center pr-2">
           <span className="label">{size ?? (requiresSize ? "Pick size" : "One size")}</span>
           <span className="text-xs">{formatMoney(price.amount, price.currencyCode)}</span>
