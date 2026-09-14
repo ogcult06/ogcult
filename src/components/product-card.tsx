@@ -82,7 +82,7 @@ export function ProductCard({ product }: { product: ShopifyProduct }) {
             ref={cardGalleryRef}
             onScroll={handleCardScroll}
             {...dragHandlers}
-            className="flex aspect-[4/5] w-full cursor-grab snap-x snap-mandatory overflow-x-auto overscroll-x-contain bg-card touch-pan-y active:cursor-grabbing [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
+            className="flex aspect-[4/5] w-full cursor-grab snap-x snap-mandatory overflow-x-auto overscroll-x-contain bg-card touch-pan-x active:cursor-grabbing [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
           >
             {primary ? (
               images.map((img, i) => (
