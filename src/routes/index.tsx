@@ -57,7 +57,7 @@ function useParallax(strength = 0.18) {
 
 function HomePage() {
   const { data, isLoading } = useQuery(productsQueryOptions());
-  const featured = sortProductsForDisplay(data ?? []).slice(0, 4);
+  const featured = sortProductsForDisplay(data ?? []);
   const hero = useParallax(0.12);
   const editorial = useParallax(0.2);
 
@@ -130,11 +130,6 @@ function HomePage() {
         </Reveal>
         <Reveal className="mt-20 md:mt-28" delay={80}>
           <ProductGrid products={featured} isLoading={isLoading} emptyState="placeholder" />
-        </Reveal>
-        <Reveal className="mt-16 flex justify-center md:mt-20" delay={120}>
-          <Link to="/shop" className="nav-link">
-            View all
-          </Link>
         </Reveal>
       </section>
 
