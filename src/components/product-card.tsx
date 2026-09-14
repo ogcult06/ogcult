@@ -108,10 +108,10 @@ export function ProductCard({ product }: { product: ShopifyProduct }) {
           </div>
 
           {soldOut && (
-            <span className="label !text-foreground absolute top-4 left-4">Sold out</span>
+            <span className="label !text-foreground absolute top-4 left-4 leading-[1.4] whitespace-nowrap">Sold out</span>
           )}
           {!soldOut && lowStock && (
-            <span className="label !text-foreground absolute top-4 left-4 opacity-0 transition-opacity duration-500 group-hover:opacity-100">
+            <span className="label !text-foreground absolute top-4 left-4 leading-[1.4] whitespace-nowrap opacity-0 transition-opacity duration-500 group-hover:opacity-100">
               Low stock
             </span>
           )}
@@ -140,7 +140,7 @@ export function ProductCard({ product }: { product: ShopifyProduct }) {
       </div>
 
       <div className="mt-5 flex items-baseline justify-between gap-4">
-        <h3 className="truncate text-[0.72rem] tracking-[0.18em] uppercase">
+        <h3 className="truncate text-[0.72rem] leading-tight tracking-[0.18em] uppercase">
           <Link to="/product/$handle" params={{ handle: p.handle }}>
             {p.title}
           </Link>
