@@ -140,7 +140,7 @@ export function ProductCard({ product }: { product: ShopifyProduct }) {
       </div>
 
       <div className="mt-5 flex items-baseline justify-between gap-4">
-        <h3 className="truncate text-[0.72rem] tracking-[0.18em] uppercase">
+        <h3 className="truncate text-[0.72rem] leading-tight tracking-[0.18em] uppercase">
           <Link to="/product/$handle" params={{ handle: p.handle }}>
             {p.title}
           </Link>
