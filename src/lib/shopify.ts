@@ -140,11 +140,11 @@ export function formatMoney(amount: string | number, currencyCode: string) {
 }
 
 /**
- * Manual display order for the core OG CULT T-shirts so the newest drop sits
- * between the existing releases in the homepage and shop grids.
- * Unlisted products fall back to createdAt (newest first).
+ * Manual display order for the core OG CULT T-shirts so the homepage and shop
+ * grids show releases in the desired order. Unlisted products fall back to
+ * createdAt (newest first).
  */
-const DISPLAY_ORDER = ["og-tees", "og-tees-1", "rosed-og", "crowned-og", "crowned-og-1"];
+const DISPLAY_ORDER = ["denim-og", "og-tees-1", "rosed-og", "invincible-og", "crowned-og-1"];
 
 export function sortProductsForDisplay<T extends { node: { handle: string; createdAt: string } }>(
   products: T[],
