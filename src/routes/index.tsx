@@ -131,11 +131,6 @@ function HomePage() {
         <Reveal className="mt-20 md:mt-28" delay={80}>
           <ProductGrid products={featured} isLoading={isLoading} emptyState="placeholder" />
         </Reveal>
-        <Reveal className="mt-16 flex justify-center md:mt-20" delay={120}>
-          <Link to="/shop" className="nav-link">
-            View all
-          </Link>
-        </Reveal>
       </section>
 
       {/* EDITORIAL CAMPAIGN */}
