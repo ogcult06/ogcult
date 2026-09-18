@@ -3,7 +3,7 @@ import { useMemo, useRef, useState } from "react";
 import { Loader2 } from "lucide-react";
 import { toast } from "sonner";
 import { useCartStore } from "@/stores/cartStore";
-import { formatMoney, sortSizes, variantStockLabel, type ShopifyProduct } from "@/lib/shopify";
+import { formatMoney, isTShirtProduct, sortSizes, variantStockLabel, type ShopifyProduct } from "@/lib/shopify";
 import { useDragScroll } from "@/hooks/use-drag-scroll";
 
 export function ProductCard({ product }: { product: ShopifyProduct }) {
@@ -145,11 +145,18 @@ export function ProductCard({ product }: { product: ShopifyProduct }) {
             {p.title}
           </Link>
         </h3>
-        <p className="shrink-0 text-[0.72rem] tracking-[0.14em] text-muted-foreground">
-          {formatMoney(
-            p.priceRange.minVariantPrice.amount,
-            p.priceRange.minVariantPrice.currencyCode,
+        <p className="flex shrink-0 items-baseline gap-2 text-[0.72rem] tracking-[0.14em] text-muted-foreground">
+          {isTShirtProduct(p) && (
+            <span className="opacity-55 line-through">
+              {formatMoney(1999, p.priceRange.minVariantPrice.currencyCode)}
+            </span>
           )}
+          <span>
+            {formatMoney(
+              p.priceRange.minVariantPrice.amount,
+              p.priceRange.minVariantPrice.currencyCode,
+            )}
+          </span>
         </p>
       </div>
 
