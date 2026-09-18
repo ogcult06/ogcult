@@ -4,7 +4,7 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { Loader2, Minus, Plus } from "lucide-react";
 import { toast } from "sonner";
 import { useCartStore } from "@/stores/cartStore";
-import { formatMoney, productQueryOptions, sortSizes } from "@/lib/shopify";
+import { formatMoney, isTShirtProduct, productQueryOptions, sortSizes } from "@/lib/shopify";
 import { useDragScroll } from "@/hooks/use-drag-scroll";
 
 const SITE_URL = "https://ogcult.store";
@@ -331,8 +331,11 @@ function ProductPage() {
         {/* INFO */}
         <div className="px-5 pt-10 md:px-10 lg:pt-4">
           <h1 className="font-display text-4xl uppercase md:text-6xl">{p.title}</h1>
-          <p className="mt-4 text-sm text-muted-foreground">
-            {formatMoney(price.amount, price.currencyCode)}
+          <p className="mt-4 flex items-baseline gap-3 text-sm text-muted-foreground">
+            {isTShirtProduct(p) && (
+              <span className="opacity-55 line-through">{formatMoney(1999, price.currencyCode)}</span>
+            )}
+            <span>{formatMoney(price.amount, price.currencyCode)}</span>
           </p>
 
           {p.description && (
@@ -463,7 +466,14 @@ function ProductPage() {
       <div className="fixed inset-x-0 bottom-2 z-40 flex gap-2 border-t border-border bg-background/90 px-4 py-3 backdrop-blur-xl md:hidden">
         <div className="flex flex-col justify-center pr-2">
           <span className="label">{size ?? (requiresSize ? "Pick size" : "One size")}</span>
-          <span className="text-xs">{formatMoney(price.amount, price.currencyCode)}</span>
+          <span className="flex items-baseline gap-2 text-xs">
+            {isTShirtProduct(p) && (
+              <span className="text-muted-foreground line-through">
+                {formatMoney(1999, price.currencyCode)}
+              </span>
+            )}
+            <span>{formatMoney(price.amount, price.currencyCode)}</span>
+          </span>
         </div>
         <button
           type="button"

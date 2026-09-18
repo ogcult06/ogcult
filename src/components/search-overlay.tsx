@@ -2,7 +2,7 @@ import { useEffect, useMemo, useState } from "react";
 import { Link } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { X } from "lucide-react";
-import { formatMoney, productsQueryOptions } from "@/lib/shopify";
+import { formatMoney, isTShirtProduct, productsQueryOptions } from "@/lib/shopify";
 
 export function SearchOverlay({ open, onClose }: { open: boolean; onClose: () => void }) {
   const [term, setTerm] = useState("");
@@ -87,11 +87,18 @@ export function SearchOverlay({ open, onClose }: { open: boolean; onClose: () =>
                     <span className="flex-1 text-sm uppercase transition-opacity group-hover:opacity-60">
                       {p.node.title}
                     </span>
-                    <span className="text-[0.7rem] text-muted-foreground">
-                      {formatMoney(
-                        p.node.priceRange.minVariantPrice.amount,
-                        p.node.priceRange.minVariantPrice.currencyCode,
+                    <span className="flex items-baseline gap-2 text-[0.7rem] text-muted-foreground">
+                      {isTShirtProduct(p.node) && (
+                        <span className="opacity-55 line-through">
+                          {formatMoney(1999, p.node.priceRange.minVariantPrice.currencyCode)}
+                        </span>
                       )}
+                      <span>
+                        {formatMoney(
+                          p.node.priceRange.minVariantPrice.amount,
+                          p.node.priceRange.minVariantPrice.currencyCode,
+                        )}
+                      </span>
                     </span>
                   </Link>
                 </li>

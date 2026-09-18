@@ -139,6 +139,10 @@ export function formatMoney(amount: string | number, currencyCode: string) {
   }
 }
 
+export function isTShirtProduct(product: ShopifyProduct["node"]) {
+  return /t[- ]?shirt|\btee\b/i.test(`${product.productType} ${product.title} ${product.tags.join(" ")}`);
+}
+
 /**
  * Manual display order for the core OG CULT T-shirts so the homepage and shop
  * grids show releases in the desired order. Unlisted products fall back to
