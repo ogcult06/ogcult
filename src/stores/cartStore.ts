@@ -1,6 +1,6 @@
 import { create } from "zustand";
 import { createJSONStorage, persist } from "zustand/middleware";
-import { storefrontApiRequest, type ShopifyProduct } from "@/lib/shopify";
+import type { ShopifyProduct } from "@/lib/shopify";
 
 export interface CartItem {
   lineId: string | null;
@@ -12,176 +12,6 @@ export interface CartItem {
   selectedOptions: Array<{ name: string; value: string }>;
 }
 
-const CART_QUERY = `
-  query cart($id: ID!) {
-    cart(id: $id) {
-      id
-      totalQuantity
-      checkoutUrl
-      cost {
-        subtotalAmount { amount currencyCode }
-        totalAmount { amount currencyCode }
-        totalTaxAmount { amount currencyCode }
-      }
-      lines(first: 100) {
-        edges {
-          node {
-            id
-            quantity
-            merchandise { ... on ProductVariant { id } }
-          }
-        }
-      }
-    }
-  }
-`;
-
-
-const CART_CREATE_MUTATION = `
-  mutation cartCreate($input: CartInput!) {
-    cartCreate(input: $input) {
-      cart {
-        id
-        checkoutUrl
-        lines(first: 100) { edges { node { id merchandise { ... on ProductVariant { id } } } } }
-      }
-      userErrors { field message }
-    }
-  }
-`;
-
-const CART_LINES_ADD_MUTATION = `
-  mutation cartLinesAdd($cartId: ID!, $lines: [CartLineInput!]!) {
-    cartLinesAdd(cartId: $cartId, lines: $lines) {
-      cart {
-        id
-        lines(first: 100) { edges { node { id merchandise { ... on ProductVariant { id } } } } }
-      }
-      userErrors { field message }
-    }
-  }
-`;
-
-const CART_LINES_UPDATE_MUTATION = `
-  mutation cartLinesUpdate($cartId: ID!, $lines: [CartLineUpdateInput!]!) {
-    cartLinesUpdate(cartId: $cartId, lines: $lines) {
-      cart { id }
-      userErrors { field message }
-    }
-  }
-`;
-
-const CART_LINES_REMOVE_MUTATION = `
-  mutation cartLinesRemove($cartId: ID!, $lineIds: [ID!]!) {
-    cartLinesRemove(cartId: $cartId, lineIds: $lineIds) {
-      cart { id }
-      userErrors { field message }
-    }
-  }
-`;
-
-function formatCheckoutUrl(checkoutUrl: string): string {
-  try {
-    const url = new URL(checkoutUrl);
-    url.searchParams.set("channel", "online_store");
-    return url.toString();
-  } catch {
-    return checkoutUrl;
-  }
-}
-
-type UserError = { field: string[] | null; message: string };
-
-function isCartNotFoundError(userErrors: UserError[]): boolean {
-  return userErrors.some(
-    (e) =>
-      e.message.toLowerCase().includes("cart not found") ||
-      e.message.toLowerCase().includes("does not exist"),
-  );
-}
-
-async function createShopifyCart(
-  item: CartItem,
-): Promise<{ cartId: string; checkoutUrl: string; lineId: string } | null> {
-  const data = await storefrontApiRequest(CART_CREATE_MUTATION, {
-    input: { lines: [{ quantity: item.quantity, merchandiseId: item.variantId }] },
-  });
-
-  if (data?.data?.cartCreate?.userErrors?.length > 0) {
-    console.error("Cart creation failed:", data.data.cartCreate.userErrors);
-    return null;
-  }
-
-  const cart = data?.data?.cartCreate?.cart;
-  if (!cart?.checkoutUrl) return null;
-
-  const lineId = cart.lines.edges[0]?.node?.id;
-  if (!lineId) return null;
-
-  return { cartId: cart.id, checkoutUrl: formatCheckoutUrl(cart.checkoutUrl), lineId };
-}
-
-async function addLineToShopifyCart(
-  cartId: string,
-  item: CartItem,
-): Promise<{ success: boolean; lineId?: string; cartNotFound?: boolean }> {
-  const data = await storefrontApiRequest(CART_LINES_ADD_MUTATION, {
-    cartId,
-    lines: [{ quantity: item.quantity, merchandiseId: item.variantId }],
-  });
-
-  const userErrors: UserError[] = data?.data?.cartLinesAdd?.userErrors || [];
-  if (isCartNotFoundError(userErrors)) return { success: false, cartNotFound: true };
-  if (userErrors.length > 0) {
-    console.error("Add line failed:", userErrors);
-    return { success: false };
-  }
-
-  const lines = data?.data?.cartLinesAdd?.cart?.lines?.edges || [];
-  const newLine = lines.find(
-    (l: { node: { id: string; merchandise: { id: string } } }) =>
-      l.node.merchandise.id === item.variantId,
-  );
-  return { success: true, lineId: newLine?.node?.id };
-}
-
-async function updateShopifyCartLine(
-  cartId: string,
-  lineId: string,
-  quantity: number,
-): Promise<{ success: boolean; cartNotFound?: boolean }> {
-  const data = await storefrontApiRequest(CART_LINES_UPDATE_MUTATION, {
-    cartId,
-    lines: [{ id: lineId, quantity }],
-  });
-
-  const userErrors: UserError[] = data?.data?.cartLinesUpdate?.userErrors || [];
-  if (isCartNotFoundError(userErrors)) return { success: false, cartNotFound: true };
-  if (userErrors.length > 0) {
-    console.error("Update line failed:", userErrors);
-    return { success: false };
-  }
-  return { success: true };
-}
-
-async function removeLineFromShopifyCart(
-  cartId: string,
-  lineId: string,
-): Promise<{ success: boolean; cartNotFound?: boolean }> {
-  const data = await storefrontApiRequest(CART_LINES_REMOVE_MUTATION, {
-    cartId,
-    lineIds: [lineId],
-  });
-
-  const userErrors: UserError[] = data?.data?.cartLinesRemove?.userErrors || [];
-  if (isCartNotFoundError(userErrors)) return { success: false, cartNotFound: true };
-  if (userErrors.length > 0) {
-    console.error("Remove line failed:", userErrors);
-    return { success: false };
-  }
-  return { success: true };
-}
-
 export interface CartCost {
   subtotalAmount: { amount: string; currencyCode: string } | null;
   totalAmount: { amount: string; currencyCode: string } | null;
@@ -190,8 +20,6 @@ export interface CartCost {
 
 interface CartStore {
   items: CartItem[];
-  cartId: string | null;
-  checkoutUrl: string | null;
   cost: CartCost | null;
   isLoading: boolean;
   isSyncing: boolean;
@@ -204,15 +32,27 @@ interface CartStore {
   removeItem: (variantId: string) => Promise<void>;
   clearCart: () => void;
   syncCart: () => Promise<void>;
-  getCheckoutUrl: () => string | null;
+  subtotal: () => number;
+  currency: () => string;
+}
+
+const MAX_QTY_PER_LINE = 10;
+
+function recalculate(items: CartItem[]): CartCost | null {
+  if (items.length === 0) return null;
+  const currencyCode = items[0]!.price.currencyCode;
+  const subtotal = items.reduce((sum, i) => sum + parseFloat(i.price.amount) * i.quantity, 0);
+  return {
+    subtotalAmount: { amount: String(subtotal), currencyCode },
+    totalAmount: { amount: String(subtotal), currencyCode },
+    totalTaxAmount: null,
+  };
 }
 
 export const useCartStore = create<CartStore>()(
   persist(
     (set, get) => ({
       items: [],
-      cartId: null,
-      checkoutUrl: null,
       cost: null,
       isLoading: false,
       isSyncing: false,
@@ -222,53 +62,17 @@ export const useCartStore = create<CartStore>()(
       openDrawer: () => set({ isDrawerOpen: true }),
       closeDrawer: () => set({ isDrawerOpen: false }),
 
-
       addItem: async (item) => {
-        const { items, cartId, clearCart } = get();
-        const existingItem = items.find((i) => i.variantId === item.variantId);
-
-        set({ isLoading: true });
-        try {
-          if (!cartId) {
-            const result = await createShopifyCart({ ...item, lineId: null });
-            if (result) {
-              set({
-                cartId: result.cartId,
-                checkoutUrl: result.checkoutUrl,
-                items: [{ ...item, lineId: result.lineId }],
-              });
-            }
-          } else if (existingItem) {
-            const newQuantity = existingItem.quantity + item.quantity;
-            if (!existingItem.lineId) {
-              console.error("Cannot update quantity for item without lineId:", existingItem);
-              return;
-            }
-            const result = await updateShopifyCartLine(cartId, existingItem.lineId, newQuantity);
-            if (result.success) {
-              const currentItems = get().items;
-              set({
-                items: currentItems.map((i) =>
-                  i.variantId === item.variantId ? { ...i, quantity: newQuantity } : i,
-                ),
-              });
-            } else if (result.cartNotFound) {
-              clearCart();
-            }
-          } else {
-            const result = await addLineToShopifyCart(cartId, { ...item, lineId: null });
-            if (result.success) {
-              const currentItems = get().items;
-              set({ items: [...currentItems, { ...item, lineId: result.lineId ?? null }] });
-            } else if (result.cartNotFound) {
-              clearCart();
-            }
-          }
-        } catch (error) {
-          console.error("Failed to add item:", error);
-        } finally {
-          set({ isLoading: false });
-        }
+        const { items } = get();
+        const existing = items.find((i) => i.variantId === item.variantId);
+        const next = existing
+          ? items.map((i) =>
+              i.variantId === item.variantId
+                ? { ...i, quantity: Math.min(MAX_QTY_PER_LINE, i.quantity + item.quantity) }
+                : i,
+            )
+          : [...items, { ...item, lineId: item.variantId }];
+        set({ items: next, cost: recalculate(next) });
       },
 
       updateQuantity: async (variantId, quantity) => {
@@ -276,138 +80,32 @@ export const useCartStore = create<CartStore>()(
           await get().removeItem(variantId);
           return;
         }
-
-        const { items, cartId, clearCart, pendingVariantIds } = get();
-        const item = items.find((i) => i.variantId === variantId);
-        if (!item?.lineId || !cartId) return;
-        if (pendingVariantIds.includes(variantId)) return;
-
-        const previousQuantity = item.quantity;
-        // Optimistic update so mobile taps feel instant.
-        set({
-          pendingVariantIds: [...pendingVariantIds, variantId],
-          items: items.map((i) => (i.variantId === variantId ? { ...i, quantity } : i)),
-        });
-
-        try {
-          const result = await updateShopifyCartLine(cartId, item.lineId, quantity);
-          if (result.cartNotFound) {
-            clearCart();
-            return;
-          }
-          if (!result.success) {
-            set({
-              items: get().items.map((i) =>
-                i.variantId === variantId ? { ...i, quantity: previousQuantity } : i,
-              ),
-            });
-            return;
-          }
-          await get().syncCart();
-        } catch (error) {
-          console.error("Failed to update quantity:", error);
-          set({
-            items: get().items.map((i) =>
-              i.variantId === variantId ? { ...i, quantity: previousQuantity } : i,
-            ),
-          });
-        } finally {
-          set({
-            pendingVariantIds: get().pendingVariantIds.filter((id) => id !== variantId),
-          });
-        }
+        const next = get().items.map((i) =>
+          i.variantId === variantId ? { ...i, quantity: Math.min(MAX_QTY_PER_LINE, quantity) } : i,
+        );
+        set({ items: next, cost: recalculate(next) });
       },
 
       removeItem: async (variantId) => {
-        const { items, cartId, clearCart, pendingVariantIds } = get();
-        const item = items.find((i) => i.variantId === variantId);
-        if (!item?.lineId || !cartId) return;
-        if (pendingVariantIds.includes(variantId)) return;
-
-        set({ pendingVariantIds: [...pendingVariantIds, variantId] });
-        try {
-          const result = await removeLineFromShopifyCart(cartId, item.lineId);
-          if (result.success) {
-            const currentItems = get().items;
-            const newItems = currentItems.filter((i) => i.variantId !== variantId);
-            if (newItems.length === 0) {
-              clearCart();
-            } else {
-              set({ items: newItems });
-              await get().syncCart();
-            }
-          } else if (result.cartNotFound) {
-            clearCart();
-          }
-        } catch (error) {
-          console.error("Failed to remove item:", error);
-        } finally {
-          set({
-            pendingVariantIds: get().pendingVariantIds.filter((id) => id !== variantId),
-          });
-        }
+        const next = get().items.filter((i) => i.variantId !== variantId);
+        set({ items: next, cost: recalculate(next) });
       },
 
-      clearCart: () =>
-        set({ items: [], cartId: null, checkoutUrl: null, cost: null, pendingVariantIds: [] }),
-      getCheckoutUrl: () => get().checkoutUrl,
+      clearCart: () => set({ items: [], cost: null, pendingVariantIds: [] }),
 
+      // Kept for compatibility with existing components; recomputes local totals.
       syncCart: async () => {
-        const { cartId, isSyncing, clearCart } = get();
-        if (!cartId || isSyncing) return;
-
-        set({ isSyncing: true });
-        try {
-          const data = await storefrontApiRequest(CART_QUERY, { id: cartId });
-          if (!data) return;
-          const cart = data?.data?.cart;
-          if (!cart || cart.totalQuantity === 0) {
-            clearCart();
-            return;
-          }
-
-          // Reconcile local lines with Shopify (source of truth).
-          const remoteLines: Array<{
-            node: { id: string; quantity: number; merchandise: { id: string } };
-          }> = cart.lines?.edges ?? [];
-          const byVariant = new Map(
-            remoteLines.map((l) => [
-              l.node.merchandise?.id,
-              { lineId: l.node.id, quantity: l.node.quantity },
-            ]),
-          );
-
-          const reconciled = get()
-            .items.map((i) => {
-              const remote = byVariant.get(i.variantId);
-              if (!remote) return null;
-              return { ...i, lineId: remote.lineId, quantity: remote.quantity };
-            })
-            .filter((i) => i !== null) as CartItem[];
-
-          set({
-            items: reconciled,
-            cost: cart.cost ?? null,
-            checkoutUrl: cart.checkoutUrl
-              ? formatCheckoutUrl(cart.checkoutUrl)
-              : get().checkoutUrl,
-          });
-        } catch (error) {
-          console.error("Failed to sync cart with Shopify:", error);
-        } finally {
-          set({ isSyncing: false });
-        }
+        set({ cost: recalculate(get().items) });
       },
 
+      subtotal: () =>
+        get().items.reduce((sum, i) => sum + parseFloat(i.price.amount) * i.quantity, 0),
+      currency: () => get().items[0]?.price.currencyCode ?? "INR",
     }),
     {
-      name: "shopify-cart",
+      name: "ogcult-cart",
       storage: createJSONStorage(() => localStorage),
-      partialize: (state) => ({
-        items: state.items,
-        cartId: state.cartId,
-        checkoutUrl: state.checkoutUrl,
-      }),
+      partialize: (state) => ({ items: state.items }),
     },
   ),
 );

@@ -1,9 +1,11 @@
-import { toast } from "sonner";
-
-export const SHOPIFY_API_VERSION = "2025-07";
-export const SHOPIFY_STORE_PERMANENT_DOMAIN = "zbqxcr-pr.myshopify.com";
-export const SHOPIFY_STOREFRONT_URL = `https://${SHOPIFY_STORE_PERMANENT_DOMAIN}/api/${SHOPIFY_API_VERSION}/graphql.json`;
-export const SHOPIFY_STOREFRONT_TOKEN = "c1b208045cf6d6702aa84b0d1f25232a";
+/**
+ * OG CULT catalogue.
+ *
+ * Products now live in the project's own database (Lovable Cloud). The data
+ * shape below is unchanged from the previous storefront integration so every
+ * existing page/component keeps working untouched.
+ */
+import { supabase } from "@/integrations/supabase/client";
 
 export interface ShopifyVariant {
   id: string;
@@ -24,6 +26,7 @@ export interface ShopifyProduct {
     tags: string[];
     createdAt: string;
     availableForSale: boolean;
+    compareAtPrice?: string | null;
     priceRange: { minVariantPrice: { amount: string; currencyCode: string } };
     images: { edges: Array<{ node: { url: string; altText: string | null } }> };
     variants: { edges: Array<{ node: ShopifyVariant }> };
@@ -31,97 +34,103 @@ export interface ShopifyProduct {
   };
 }
 
-const PRODUCT_FIELDS = `
-  id
-  title
-  description
-  handle
-  productType
-  tags
-  createdAt
-  availableForSale
-  priceRange { minVariantPrice { amount currencyCode } }
-  images(first: 20) { edges { node { url altText } } }
-  variants(first: 25) {
-    edges {
-      node {
-        id
-        title
-        price { amount currencyCode }
-        availableForSale
-        selectedOptions { name value }
-      }
-    }
-  }
-  options { name values }
-`;
+type DbVariant = {
+  id: string;
+  size: string;
+  price: number | string;
+  currency: string;
+  available: boolean;
+  stock: number | null;
+  position: number;
+};
 
-export const STOREFRONT_QUERY = `
-  query GetProducts($first: Int!, $query: String) {
-    products(first: $first, query: $query) {
-      edges { node { ${PRODUCT_FIELDS} } }
-    }
-  }
-`;
+type DbProduct = {
+  id: string;
+  handle: string;
+  title: string;
+  description: string;
+  product_type: string;
+  tags: string[] | null;
+  images: Array<{ url: string; altText: string | null }> | null;
+  compare_at_price: number | string | null;
+  sort_order: number;
+  created_at: string;
+  product_variants: DbVariant[] | null;
+};
 
-export const PRODUCT_BY_HANDLE_QUERY = `
-  query GetProduct($handle: String!) {
-    product(handle: $handle) { ${PRODUCT_FIELDS} }
-  }
-`;
+const PRODUCT_SELECT =
+  "id, handle, title, description, product_type, tags, images, compare_at_price, sort_order, created_at, product_variants(id, size, price, currency, available, stock, position)";
 
-export async function storefrontApiRequest(query: string, variables: Record<string, unknown> = {}) {
-  const response = await fetch(SHOPIFY_STOREFRONT_URL, {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-      "X-Shopify-Storefront-Access-Token": SHOPIFY_STOREFRONT_TOKEN,
+function mapProduct(row: DbProduct): ShopifyProduct {
+  const variants = [...(row.product_variants ?? [])].sort((a, b) => a.position - b.position);
+  const currency = variants[0]?.currency ?? "INR";
+  const prices = variants.map((v) => Number(v.price));
+  const minPrice = prices.length ? Math.min(...prices) : 0;
+
+  return {
+    node: {
+      id: row.id,
+      title: row.title,
+      description: row.description ?? "",
+      handle: row.handle,
+      productType: row.product_type ?? "",
+      tags: row.tags ?? [],
+      createdAt: row.created_at,
+      availableForSale: variants.some((v) => v.available),
+      compareAtPrice: row.compare_at_price != null ? String(row.compare_at_price) : null,
+      priceRange: { minVariantPrice: { amount: String(minPrice), currencyCode: currency } },
+      images: { edges: (row.images ?? []).map((img) => ({ node: img })) },
+      variants: {
+        edges: variants.map((v) => ({
+          node: {
+            id: v.id,
+            title: v.size,
+            price: { amount: String(Number(v.price)), currencyCode: v.currency },
+            availableForSale: v.available,
+            quantityAvailable: v.stock,
+            selectedOptions: [{ name: "Size", value: v.size }],
+          },
+        })),
+      },
+      options: [{ name: "Size", values: sortSizes(variants.map((v) => v.size)) }],
     },
-    body: JSON.stringify({ query, variables }),
-  });
-
-  if (response.status === 402) {
-    toast.error("Shopify: Payment required", {
-      description:
-        "Shopify API access requires an active Shopify billing plan. Visit https://admin.shopify.com to upgrade.",
-    });
-    return;
-  }
-
-  if (!response.ok) {
-    throw new Error(`HTTP error! status: ${response.status}`);
-  }
-
-  const data = await response.json();
-
-  if (data.errors) {
-    throw new Error(
-      `Error calling Shopify: ${data.errors.map((e: { message: string }) => e.message).join(", ")}`,
-    );
-  }
-
-  return data;
+  };
 }
 
-export async function fetchProducts(first = 50, query?: string): Promise<ShopifyProduct[]> {
-  const data = await storefrontApiRequest(STOREFRONT_QUERY, { first, query: query ?? null });
-  return data?.data?.products?.edges ?? [];
+export async function fetchProducts(_first = 50, query?: string): Promise<ShopifyProduct[]> {
+  let request = supabase
+    .from("products")
+    .select(PRODUCT_SELECT)
+    .eq("active", true)
+    .order("sort_order", { ascending: true });
+
+  if (query) request = request.ilike("title", `%${query}%`);
+
+  const { data, error } = await request;
+  if (error) throw new Error(error.message);
+  return ((data ?? []) as unknown as DbProduct[]).map(mapProduct);
 }
 
 export async function fetchProductByHandle(handle: string): Promise<ShopifyProduct | null> {
-  const data = await storefrontApiRequest(PRODUCT_BY_HANDLE_QUERY, { handle });
-  const node = data?.data?.product;
-  return node ? { node } : null;
+  const { data, error } = await supabase
+    .from("products")
+    .select(PRODUCT_SELECT)
+    .eq("handle", handle)
+    .eq("active", true)
+    .maybeSingle();
+
+  if (error) throw new Error(error.message);
+  return data ? mapProduct(data as unknown as DbProduct) : null;
 }
 
 export const productsQueryOptions = (query?: string) => ({
-  queryKey: ["shopify", "products", query ?? "all"] as const,
+  queryKey: ["catalog", "products", query ?? "all"] as const,
   queryFn: () => fetchProducts(50, query),
   staleTime: 60_000,
 });
 
 export const productQueryOptions = (handle: string) => ({
-  queryKey: ["shopify", "product", handle] as const,
+  queryKey: ["catalog", "product", handle] as const,
   queryFn: () => fetchProductByHandle(handle),
   staleTime: 60_000,
 });
@@ -140,29 +149,17 @@ export function formatMoney(amount: string | number, currencyCode: string) {
 }
 
 export function isTShirtProduct(product: ShopifyProduct["node"]) {
-  return /t[- ]?shirt|\btee\b/i.test(`${product.productType} ${product.title} ${product.tags.join(" ")}`);
+  return /t[- ]?shirt|\btee\b/i.test(
+    `${product.productType} ${product.title} ${product.tags.join(" ")}`,
+  );
 }
-
-/**
- * Manual display order for the core OG CULT T-shirts so the homepage and shop
- * grids show releases in the desired order. Unlisted products fall back to
- * createdAt (newest first).
- */
-const DISPLAY_ORDER = ["denim-og", "og-tees-1", "rosed-og", "invincible-og", "crowned-og-1"];
 
 export function sortProductsForDisplay<T extends { node: { handle: string; createdAt: string } }>(
   products: T[],
 ): T[] {
-  const indexOf = (handle: string) => {
-    const i = DISPLAY_ORDER.indexOf(handle);
-    return i === -1 ? Number.MAX_SAFE_INTEGER : i;
-  };
-  return [...products].sort((a, b) => {
-    const ia = indexOf(a.node.handle);
-    const ib = indexOf(b.node.handle);
-    if (ia !== ib) return ia - ib;
-    return new Date(b.node.createdAt).getTime() - new Date(a.node.createdAt).getTime();
-  });
+  // Order is stored per product in the database (sort_order) and already
+  // applied by the query, so this keeps the incoming order.
+  return [...products];
 }
 
 /** Size option values across variants, in a sensible clothing order when possible. */
@@ -185,8 +182,6 @@ export function variantStockLabel(variant: ShopifyVariant | undefined) {
   if (!variant) return null;
   if (!variant.availableForSale) return "SOLD OUT";
   const qty = variant.quantityAvailable;
-  if (qty != null && qty <= LOW_STOCK_THRESHOLD) {
-    return "LOW STOCK";
-  }
+  if (qty != null && qty <= LOW_STOCK_THRESHOLD) return "LOW STOCK";
   return null;
 }
