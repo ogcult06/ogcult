@@ -5,17 +5,8 @@ import { useCartStore } from "@/stores/cartStore";
 import { formatMoney } from "@/lib/shopify";
 
 export function CartDrawer() {
-  const {
-    items,
-    isDrawerOpen,
-    closeDrawer,
-    isLoading,
-    isSyncing,
-    updateQuantity,
-    removeItem,
-    getCheckoutUrl,
-    syncCart,
-  } = useCartStore();
+  const { items, isDrawerOpen, closeDrawer, isLoading, isSyncing, updateQuantity, removeItem, syncCart } =
+    useCartStore();
 
   useEffect(() => {
     if (isDrawerOpen) syncCart();
@@ -31,16 +22,8 @@ export function CartDrawer() {
   }, [isDrawerOpen, closeDrawer]);
 
   const totalItems = items.reduce((sum, i) => sum + i.quantity, 0);
-  const currency = items[0]?.price.currencyCode ?? "USD";
+  const currency = items[0]?.price.currencyCode ?? "INR";
   const subtotal = items.reduce((sum, i) => sum + parseFloat(i.price.amount) * i.quantity, 0);
-
-  const handleCheckout = () => {
-    const checkoutUrl = getCheckoutUrl();
-    if (checkoutUrl) {
-      window.open(checkoutUrl, "_blank");
-      closeDrawer();
-    }
-  };
 
   return (
     <div
