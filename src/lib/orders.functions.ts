@@ -8,6 +8,27 @@ import {
   normalisePhone,
 } from "./order-utils";
 
+export interface TrackedOrder {
+  order_number: string;
+  created_at: string;
+  order_status: string;
+  payment_status: string;
+  payment_method: string;
+  total: number;
+  currency: string;
+  tracking_number: string | null;
+  tracking_courier: string | null;
+  customer_name: string;
+  city: string;
+  state: string;
+  order_items: Array<{
+    product_title: string;
+    size: string;
+    quantity: number;
+    image_url: string | null;
+  }>;
+}
+
 export interface CheckoutLineInput {
   variantId: string;
   quantity: number;
@@ -403,5 +424,5 @@ export const trackOrder = createServerFn({ method: "POST" })
 
     delete order["customer_email"];
     delete order["customer_phone"];
-    return { ok: true as const, order };
+    return { ok: true as const, order: JSON.parse(JSON.stringify(order)) as TrackedOrder };
   });

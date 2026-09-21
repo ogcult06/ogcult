@@ -1,17 +1,22 @@
 import { createServerFn } from "@tanstack/react-start";
+import type { SupabaseClient } from "@supabase/supabase-js";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
+import type { Database } from "@/integrations/supabase/types";
 
 import type { OrderStatus } from "./order-utils";
 
-async function assertAdmin(context: { supabase: { rpc: Function }; userId: string }) {
-  const { data, error } = await (context.supabase.rpc as (
-    fn: string,
-    args: Record<string, unknown>,
-  ) => Promise<{ data: unknown; error: unknown }>)("has_role", {
+type AuthContext = { supabase: SupabaseClient<Database>; userId: string };
+
+async function isAdmin(context: AuthContext) {
+  const { data, error } = await context.supabase.rpc("has_role", {
     _user_id: context.userId,
     _role: "admin",
   });
-  if (error || data !== true) throw new Error("Forbidden");
+  return !error && data === true;
+}
+
+async function assertAdmin(context: AuthContext) {
+  if (!(await isAdmin(context))) throw new Error("Forbidden");
 }
 
 const ORDER_LIST_FIELDS =
@@ -20,14 +25,7 @@ const ORDER_LIST_FIELDS =
 export const adminWhoAmI = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth])
   .handler(async ({ context }) => {
-    const { data } = await (context.supabase.rpc as (
-      fn: string,
-      args: Record<string, unknown>,
-    ) => Promise<{ data: unknown }>)("has_role", {
-      _user_id: context.userId,
-      _role: "admin",
-    });
-    return { isAdmin: data === true, userId: context.userId };
+    return { isAdmin: await isAdmin(context as AuthContext), userId: context.userId };
   });
 
 export const listOrders = createServerFn({ method: "POST" })
@@ -42,7 +40,7 @@ export const listOrders = createServerFn({ method: "POST" })
     }) => data,
   )
   .handler(async ({ data, context }) => {
-    await assertAdmin(context as never);
+    await assertAdmin(context as AuthContext);
     const { getAdmin } = await import("./store.server");
     const admin = await getAdmin();
 
@@ -63,9 +61,9 @@ export const listOrders = createServerFn({ method: "POST" })
       if (digits.length >= 4) parts.push(`customer_phone.ilike.%${digits}%`);
       query = query.or(parts.join(","));
     }
-    if (data.orderStatus) query = query.eq("order_status", data.orderStatus);
-    if (data.paymentStatus) query = query.eq("payment_status", data.paymentStatus);
-    if (data.paymentMethod) query = query.eq("payment_method", data.paymentMethod);
+    if (data.orderStatus) query = query.eq("order_status", data.orderStatus as never);
+    if (data.paymentStatus) query = query.eq("payment_status", data.paymentStatus as never);
+    if (data.paymentMethod) query = query.eq("payment_method", data.paymentMethod as never);
 
     const { data: rows, error } = await query;
     if (error) throw new Error(error.message);
@@ -76,7 +74,7 @@ export const getAdminOrder = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((data: { id: string }) => data)
   .handler(async ({ data, context }) => {
-    await assertAdmin(context as never);
+    await assertAdmin(context as AuthContext);
     const { getAdmin } = await import("./store.server");
     const admin = await getAdmin();
     const { data: order, error } = await admin
@@ -104,7 +102,7 @@ export const updateOrder = createServerFn({ method: "POST" })
     }) => data,
   )
   .handler(async ({ data, context }) => {
-    await assertAdmin(context as never);
+    await assertAdmin(context as AuthContext);
     const { getAdmin } = await import("./store.server");
     const admin = await getAdmin();
 
@@ -119,7 +117,7 @@ export const updateOrder = createServerFn({ method: "POST" })
     if (data.fulfillmentStatus) patch["fulfillment_status"] = data.fulfillmentStatus;
     if (data.orderStatus === "shipped") patch["fulfillment_status"] = "fulfilled";
 
-    const { error } = await admin.from("orders").update(patch).eq("id", data.id);
+    const { error } = await admin.from("orders").update(patch as never).eq("id", data.id);
     if (error) throw new Error(error.message);
 
     if (data.orderStatus) {
@@ -136,7 +134,7 @@ export const updateOrder = createServerFn({ method: "POST" })
 export const getSettings = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth])
   .handler(async ({ context }) => {
-    await assertAdmin(context as never);
+    await assertAdmin(context as AuthContext);
     const { getAdmin, razorpayKeys } = await import("./store.server");
     const admin = await getAdmin();
     const { data, error } = await admin.from("store_settings").select("*").eq("id", true).single();
@@ -152,7 +150,7 @@ export const saveSettings = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((data: Record<string, unknown>) => data)
   .handler(async ({ data, context }) => {
-    await assertAdmin(context as never);
+    await assertAdmin(context as AuthContext);
     const { getAdmin } = await import("./store.server");
     const admin = await getAdmin();
 
@@ -172,7 +170,7 @@ export const saveSettings = createServerFn({ method: "POST" })
     const patch: Record<string, unknown> = {};
     for (const key of allowed) if (key in data) patch[key] = data[key];
 
-    const { error } = await admin.from("store_settings").update(patch).eq("id", true);
+    const { error } = await admin.from("store_settings").update(patch as never).eq("id", true);
     if (error) throw new Error(error.message);
     return { ok: true };
   });
@@ -180,7 +178,7 @@ export const saveSettings = createServerFn({ method: "POST" })
 export const exportOrdersCsv = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .handler(async ({ context }) => {
-    await assertAdmin(context as never);
+    await assertAdmin(context as AuthContext);
     const { getAdmin } = await import("./store.server");
     const admin = await getAdmin();
     const { data, error } = await admin

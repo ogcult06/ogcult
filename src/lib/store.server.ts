@@ -126,7 +126,9 @@ export async function sendOrderConfirmationOnce(orderId: string) {
     const settings = await loadSettings();
     // The template registry only exists once app emails are set up for the
     // project; until then confirmation emails are skipped, not faked.
-    const mod = await import("./email-templates/send-email").catch(() => null);
+    // Resolved at runtime: the module only exists once app emails are set up.
+    const specifier = "./email-templates/send-email";
+    const mod = await import(/* @vite-ignore */ specifier).catch(() => null);
     if (!mod || typeof (mod as { sendTemplateEmail?: unknown }).sendTemplateEmail !== "function") {
       return { sent: false, reason: "email_not_configured" };
     }
