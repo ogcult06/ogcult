@@ -5,17 +5,8 @@ import { useCartStore } from "@/stores/cartStore";
 import { formatMoney } from "@/lib/shopify";
 
 export function CartDrawer() {
-  const {
-    items,
-    isDrawerOpen,
-    closeDrawer,
-    isLoading,
-    isSyncing,
-    updateQuantity,
-    removeItem,
-    getCheckoutUrl,
-    syncCart,
-  } = useCartStore();
+  const { items, isDrawerOpen, closeDrawer, isLoading, isSyncing, updateQuantity, removeItem, syncCart } =
+    useCartStore();
 
   useEffect(() => {
     if (isDrawerOpen) syncCart();
@@ -31,16 +22,8 @@ export function CartDrawer() {
   }, [isDrawerOpen, closeDrawer]);
 
   const totalItems = items.reduce((sum, i) => sum + i.quantity, 0);
-  const currency = items[0]?.price.currencyCode ?? "USD";
+  const currency = items[0]?.price.currencyCode ?? "INR";
   const subtotal = items.reduce((sum, i) => sum + parseFloat(i.price.amount) * i.quantity, 0);
-
-  const handleCheckout = () => {
-    const checkoutUrl = getCheckoutUrl();
-    if (checkoutUrl) {
-      window.open(checkoutUrl, "_blank");
-      closeDrawer();
-    }
-  };
 
   return (
     <div
@@ -149,16 +132,11 @@ export function CartDrawer() {
                 <span className="text-sm">{formatMoney(subtotal, currency)}</span>
               </div>
               <p className="mt-2 text-[0.65rem] text-muted-foreground">
-                Shipping and taxes calculated at checkout.
+                Shipping and COD charges calculated at checkout.
               </p>
-              <button
-                type="button"
-                onClick={handleCheckout}
-                disabled={isLoading || isSyncing}
-                className="btn-cult mt-5 w-full"
-              >
+              <Link to="/checkout" onClick={closeDrawer} className="btn-cult mt-5 w-full">
                 {isLoading || isSyncing ? <Loader2 className="h-4 w-4 animate-spin" /> : "Checkout"}
-              </button>
+              </Link>
               <button type="button" onClick={closeDrawer} className="btn-ghost-cult mt-3 w-full">
                 Continue shopping
               </button>

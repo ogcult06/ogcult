@@ -102,7 +102,6 @@ function ProductPage() {
   const addItem = useCartStore((s) => s.addItem);
   const openDrawer = useCartStore((s) => s.openDrawer);
   const cartLoading = useCartStore((s) => s.isLoading);
-  const getCheckoutUrl = useCartStore((s) => s.getCheckoutUrl);
 
   const galleryRef = useRef<HTMLDivElement>(null);
   const { dragHandlers, didDrag } = useDragScroll(galleryRef);
@@ -179,9 +178,12 @@ function ProductPage() {
   };
 
   const handleBuyNow = async () => {
+    if (requiresSize && !size) {
+      toast.error("Select a size first");
+      return;
+    }
     await handleAdd();
-    const url = getCheckoutUrl();
-    if (url) window.open(url, "_blank");
+    window.location.href = "/checkout";
   };
 
   if (isLoading) {
