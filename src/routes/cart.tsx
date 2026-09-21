@@ -1,4 +1,4 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
+import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { Loader2, Minus, Plus, X } from "lucide-react";
 import { useCartStore } from "@/stores/cartStore";
@@ -31,7 +31,7 @@ function CartPage() {
   const updateQuantity = useCartStore((s) => s.updateQuantity);
   const removeItem = useCartStore((s) => s.removeItem);
   const syncCart = useCartStore((s) => s.syncCart);
-  const getCheckoutUrl = useCartStore((s) => s.getCheckoutUrl);
+  const navigate = useNavigate();
 
   const [hydrated, setHydrated] = useState(false);
   useEffect(() => {
@@ -49,8 +49,7 @@ function CartPage() {
   const totalUnits = items.reduce((sum, i) => sum + i.quantity, 0);
 
   const checkout = () => {
-    const url = getCheckoutUrl();
-    if (url) window.open(url, "_blank");
+    navigate({ to: "/checkout" });
   };
 
   if (!hydrated) {
