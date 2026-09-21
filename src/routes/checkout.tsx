@@ -62,8 +62,8 @@ function Field({
 }: {
   label: string;
   children: React.ReactNode;
-  error?: string;
-  optional?: boolean;
+  error?: string | undefined;
+  optional?: boolean | undefined;
 }) {
   return (
     <label className="block">
