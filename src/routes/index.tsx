@@ -9,7 +9,6 @@ import { Reveal } from "@/components/reveal";
 import look1 from "@/assets/p-hoodie.jpg";
 import look2 from "@/assets/p-tee.jpg";
 import look3 from "@/assets/p-cargo.jpg";
-import look4 from "@/assets/p-jacket.jpg";
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -88,7 +87,6 @@ const lookbook = [
   { label: "Hoodies", image: look1, search: { filter: "Hoodies" } },
   { label: "Oversized Tees", image: look2, search: { filter: "T-Shirts" } },
   { label: "Sweatpants", image: look3, search: { filter: "Sweatpants" } },
-  { label: "Caps", image: look4, search: { filter: "Caps" } },
 ] as const;
 
 function HomePage() {

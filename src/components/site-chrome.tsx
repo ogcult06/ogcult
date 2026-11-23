@@ -25,7 +25,6 @@ const drawerCategories = [
   { label: "Oversized Sweatshirts", to: "/shop", search: { filter: "Sweatshirts" } },
   { label: "Oversized T-Shirts", to: "/shop", search: { filter: "T-Shirts" } },
   { label: "Sweatpants", to: "/shop", search: { filter: "Sweatpants" } },
-  { label: "Caps", to: "/shop", search: { filter: "Caps" } },
 ] as const;
 
 const collections = [
