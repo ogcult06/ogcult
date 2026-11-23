@@ -63,7 +63,7 @@ const heroSlides = [
     image: imagery.hero,
     alt: "OG CULT campaign — figure in an underground car park at night",
     kicker: "Vol. 01 — Nightshift",
-    headline: "Wear Become OG",
+    headline: "Wear / Become OG",
     sub: "Black Label Drop",
   },
   {
@@ -148,7 +148,6 @@ function HomePage() {
             <h1 className="display-hero mt-5 flex items-center gap-4 text-bone md:gap-6">
               <span className="flex flex-col items-end text-right leading-[0.95] text-[0.62em]">
                 <span>OG CULT</span>
-                <span>|</span>
               </span>
               <span aria-hidden className="h-[1.15em] w-[3px] shrink-0 bg-bone/70 md:w-[4px]" />
               <span>{currentSlide.headline}</span>
