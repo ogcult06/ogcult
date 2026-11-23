@@ -154,6 +154,18 @@ export function isTShirtProduct(product: ShopifyProduct["node"]) {
   );
 }
 
+/**
+ * Compare-at / MRP pricing. Returns the original price and the percentage off
+ * when a product is genuinely discounted (compare price strictly greater).
+ */
+export function discountInfo(product: ShopifyProduct["node"]) {
+  const price = parseFloat(product.priceRange.minVariantPrice.amount);
+  const compare = product.compareAtPrice ? parseFloat(product.compareAtPrice) : null;
+  if (!compare || compare <= price) return null;
+  const pct = Math.round(((compare - price) / compare) * 100);
+  return { compare, pct: Math.max(pct, 1) };
+}
+
 export function sortProductsForDisplay<T extends { node: { handle: string; createdAt: string } }>(
   products: T[],
 ): T[] {

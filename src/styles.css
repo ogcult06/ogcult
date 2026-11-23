@@ -5,11 +5,16 @@
 @custom-variant dark (&:is(.dark *));
 
 /*
- * OG CULT design system — dark luxury streetwear.
+ * OG CULT design system — clean minimal streetwear (tenzen-inspired light theme).
  * All colors are oklch semantic tokens. Never hardcode colors in components.
  */
 
 @theme inline {
+  --color-success: var(--success);
+  --color-success-foreground: var(--success-foreground);
+  --color-warning: var(--warning);
+  --color-warning-foreground: var(--warning-foreground);
+
   --radius-sm: 0px;
   --radius-md: 0px;
   --radius-lg: 0px;
@@ -45,27 +50,31 @@
 
 :root {
   --radius: 0px;
-  --background: oklch(0.05 0 0);
-  --foreground: oklch(0.951 0.008 90);
-  --card: oklch(0.176 0 0);
-  --card-foreground: oklch(0.96 0.002 260);
-  --popover: oklch(0.1 0 0);
-  --popover-foreground: oklch(0.96 0.002 260);
-  --primary: oklch(0.96 0.002 260);
-  --primary-foreground: oklch(0.06 0 0);
-  --secondary: oklch(0.22 0 0);
-  --secondary-foreground: oklch(0.96 0.002 260);
-  --muted: oklch(0.14 0 0);
-  --muted-foreground: oklch(0.63 0 0);
-  --accent: oklch(0.2 0 0);
-  --accent-foreground: oklch(0.96 0.002 260);
+  --background: oklch(1 0 0);
+  --foreground: oklch(0.18 0 0);
+  --card: oklch(0.972 0 0);
+  --card-foreground: oklch(0.18 0 0);
+  --popover: oklch(1 0 0);
+  --popover-foreground: oklch(0.18 0 0);
+  --primary: oklch(0.18 0 0);
+  --primary-foreground: oklch(0.98 0 0);
+  --secondary: oklch(0.96 0 0);
+  --secondary-foreground: oklch(0.18 0 0);
+  --muted: oklch(0.96 0 0);
+  --muted-foreground: oklch(0.52 0 0);
+  --accent: oklch(0.95 0 0);
+  --accent-foreground: oklch(0.18 0 0);
   --destructive: oklch(0.52 0.19 27);
-  --destructive-foreground: oklch(0.96 0.002 260);
-  --border: oklch(0.235 0 0);
-  --input: oklch(0.24 0 0);
-  --ring: oklch(0.5 0 0);
+  --destructive-foreground: oklch(0.98 0 0);
+  --border: oklch(0.9 0 0);
+  --input: oklch(0.9 0 0);
+  --ring: oklch(0.4 0 0);
   --blood: oklch(0.46 0.19 26);
-  --bone: oklch(0.87 0.02 85);
+  --bone: oklch(0.96 0 0);
+  --success: oklch(0.6 0.14 145);
+  --success-foreground: oklch(0.98 0 0);
+  --warning: oklch(0.75 0.16 70);
+  --warning-foreground: oklch(0.2 0 0);
 }
 
 @layer base {
@@ -108,8 +117,8 @@
   inset: 0;
   z-index: 60;
   pointer-events: none;
-  opacity: 0.055;
-  mix-blend-mode: screen;
+  opacity: 0.04;
+  mix-blend-mode: multiply;
   background-image: url("data:image/svg+xml;utf8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3'/%3E%3C/filter%3E%3Crect width='160' height='160' filter='url(%23n)'/%3E%3C/svg%3E");
   animation: grain-shift 1.1s steps(3) infinite;
 }
@@ -266,5 +275,51 @@
   &:hover {
     border-color: var(--color-foreground);
     background: var(--color-secondary);
+  }
+}
+
+/* Inline quick-view size pill */
+@utility size-pill {
+  font-family: var(--font-sans);
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  font-size: 0.625rem;
+  padding: 0.4rem 0.7rem;
+  border: 1px solid var(--color-border);
+  background: transparent;
+  color: var(--color-foreground);
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  &:hover:not(:disabled) {
+    border-color: var(--color-foreground);
+    background: var(--color-foreground);
+    color: var(--color-background);
+  }
+  &:disabled {
+    color: var(--color-muted-foreground);
+    opacity: 0.35;
+    text-decoration: line-through;
+  }
+}
+
+/* Discount badge — green high contrast */
+@utility discount-badge {
+  display: inline-flex;
+  align-items: center;
+  font-family: var(--font-sans);
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  font-size: 0.6rem;
+  font-weight: 600;
+  padding: 0.2rem 0.55rem;
+  background: var(--color-success);
+  color: var(--color-success-foreground);
+}
+
+/* Hide scrollbars for horizontal carousels */
+@utility no-scrollbar {
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+  &::-webkit-scrollbar {
+    display: none;
   }
 }
