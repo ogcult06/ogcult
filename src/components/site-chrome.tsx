@@ -1,6 +1,17 @@
 import { Link, useNavigate } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
-import { Search, ShoppingBag, User, Menu, X, ChevronRight } from "lucide-react";
+import {
+  Search,
+  ShoppingBag,
+  User,
+  Menu,
+  X,
+  ChevronRight,
+  Truck,
+  Banknote,
+  Headphones,
+  ShieldCheck,
+} from "lucide-react";
 import { useCartStore } from "@/stores/cartStore";
 import { SearchOverlay } from "@/components/search-overlay";
 import { Newsletter } from "@/components/newsletter";
@@ -288,59 +299,104 @@ export function SiteHeader() {
 }
 
 export function SiteFooter() {
+  const [activeTab, setActiveTab] = useState(0);
+
+  const policyTabs = [
+    {
+      icon: Truck,
+      title: "Free shipping",
+      body: "Orders placed before 4 PM IST dispatch the same day. Free standard shipping across India — no minimum order.",
+    },
+    {
+      icon: Banknote,
+      title: "Cash on delivery",
+      body: "Pay in cash when your order arrives. Available pan-India on orders up to ₹15,000. No advance payment required.",
+    },
+    {
+      icon: Headphones,
+      title: "Priority support",
+      body: "Reach our team 7 days a week via email or WhatsApp. Every query is answered within 12 hours.",
+    },
+    {
+      icon: ShieldCheck,
+      title: "OG Cult's promise",
+      body: "Easy replacements within 14 days on unworn items. If anything arrives off, we make it right at no cost to you.",
+    },
+  ];
+
   return (
-    <footer className="border-t border-border px-5 pt-16 pb-10 md:px-10">
-      <div className="grid gap-12 md:grid-cols-[1.2fr_1fr]">
-        <div className="grid grid-cols-2 gap-10">
-          <div>
-            <p className="label">Shop</p>
-            <ul className="mt-5 space-y-3">
-              <li>
-                <Link to="/shop" className="text-xs uppercase hover:opacity-60">
-                  Shop
-                </Link>
-              </li>
-              <li>
-                <Link
-                  to="/shop"
-                  search={{ filter: "New Drop" }}
-                  className="text-xs uppercase hover:opacity-60"
+    <>
+      {/* ───────── Policy info tabs ───────── */}
+      <section className="border-t border-border bg-background">
+        <div className="grid grid-cols-2 md:grid-cols-4">
+          {policyTabs.map((tab, i) => {
+            const isActive = activeTab === i;
+            return (
+              <button
+                key={tab.title}
+                type="button"
+                onClick={() => setActiveTab(i)}
+                className={`flex flex-col items-start gap-3 border-b border-border px-5 py-6 text-left transition-colors md:px-8 md:py-8 ${
+                  i < policyTabs.length - 1 ? "md:border-r" : ""
+                } ${i % 2 === 0 ? "border-r md:border-r" : ""} ${
+                  isActive ? "bg-secondary" : "hover:bg-secondary/50"
+                }`}
+              >
+                <tab.icon className="h-6 w-6 text-foreground" strokeWidth={1.5} />
+                <span className="text-[0.72rem] font-semibold tracking-[0.14em] uppercase text-foreground">
+                  {tab.title}
+                </span>
+                <span
+                  className={`overflow-hidden text-[0.7rem] leading-relaxed text-muted-foreground transition-all duration-300 ${
+                    isActive ? "mt-0 max-h-40 opacity-100" : "max-h-0 opacity-0"
+                  }`}
                 >
-                  New Drop
-                </Link>
-              </li>
-              <li>
-                <Link to="/size-guide" className="text-xs uppercase hover:opacity-60">
-                  Size Guide
-                </Link>
-              </li>
-              <li>
-                <Link to="/shipping-returns" className="text-xs uppercase hover:opacity-60">
-                  Shipping & Returns
-                </Link>
-              </li>
-            </ul>
-          </div>
+                  {tab.body}
+                </span>
+              </button>
+            );
+          })}
+        </div>
+      </section>
+
+      {/* ───────── 4-column footer ───────── */}
+      <footer className="border-t border-border bg-background px-5 pt-16 pb-8 md:px-10 md:pt-20">
+        <div className="grid gap-10 md:grid-cols-4">
+          {/* OG CULT */}
           <div>
-            <p className="label">Brand</p>
+            <p className="font-logo text-lg tracking-[0.16em] uppercase text-foreground">
+              {brand.name}
+            </p>
             <ul className="mt-5 space-y-3">
               <li>
-                <Link to="/about" className="text-xs uppercase hover:opacity-60">
+                <Link to="/about" className="text-[0.72rem] tracking-[0.1em] uppercase text-muted-foreground transition-colors hover:text-foreground">
                   About
                 </Link>
               </li>
               <li>
-                <Link to="/contact" className="text-xs uppercase hover:opacity-60">
-                  Contact
+                <Link to="/size-guide" className="text-[0.72rem] tracking-[0.1em] uppercase text-muted-foreground transition-colors hover:text-foreground">
+                  Sizing Guide
                 </Link>
               </li>
+              <li>
+                <Link to="/shop" className="text-[0.72rem] tracking-[0.1em] uppercase text-muted-foreground transition-colors hover:text-foreground">
+                  Shop All
+                </Link>
+              </li>
+            </ul>
+          </div>
+
+          {/* Social */}
+          <div>
+            <p className="text-[0.62rem] tracking-[0.28em] uppercase text-muted-foreground">Social</p>
+            <ul className="mt-5 space-y-3">
               {brand.socials.map((s) => (
                 <li key={s.label}>
                   <a
                     href={s.href}
                     target="_blank"
                     rel="noreferrer"
-                    className="text-xs uppercase hover:opacity-60"
+                    className="text-[0.72rem] tracking-[0.1em] uppercase text-muted-foreground transition-colors hover:text-foreground"
                   >
                     {s.label}
                   </a>
@@ -348,27 +404,63 @@ export function SiteFooter() {
               ))}
             </ul>
           </div>
-        </div>
-        <div className="hidden md:block">
-          <Newsletter compact />
-        </div>
-      </div>
 
-      <p aria-hidden="true" className="display-xl mt-16 text-muted-foreground/15">
-        OG Cult
-      </p>
+          {/* Legal */}
+          <div>
+            <p className="text-[0.62rem] tracking-[0.28em] uppercase text-muted-foreground">Legal</p>
+            <ul className="mt-5 space-y-3">
+              <li>
+                <Link to="/privacy" className="text-[0.72rem] tracking-[0.1em] uppercase text-muted-foreground transition-colors hover:text-foreground">
+                  Privacy Policy
+                </Link>
+              </li>
+              <li>
+                <Link to="/shipping-returns" className="text-[0.72rem] tracking-[0.1em] uppercase text-muted-foreground transition-colors hover:text-foreground">
+                  Cancellation & Refund
+                </Link>
+              </li>
+              <li>
+                <Link to="/shipping-returns" className="text-[0.72rem] tracking-[0.1em] uppercase text-muted-foreground transition-colors hover:text-foreground">
+                  Shipping & Exchange
+                </Link>
+              </li>
+              <li>
+                <Link to="/terms" className="text-[0.72rem] tracking-[0.1em] uppercase text-muted-foreground transition-colors hover:text-foreground">
+                  Terms & Conditions
+                </Link>
+              </li>
+            </ul>
+          </div>
 
-      <div className="mt-8 flex flex-col gap-4 border-t border-border pt-6 md:flex-row md:items-center md:justify-between">
-        <p className="label">© {new Date().getFullYear()} OG Cult</p>
-        <div className="flex gap-6">
-          <Link to="/privacy" className="label transition-colors hover:!text-foreground">
-            Privacy
-          </Link>
-          <Link to="/terms" className="label transition-colors hover:!text-foreground">
-            Terms
-          </Link>
+          {/* Contact Us */}
+          <div>
+            <p className="text-[0.62rem] tracking-[0.28em] uppercase text-muted-foreground">Contact Us</p>
+            <ul className="mt-5 space-y-3">
+              <li>
+                <a
+                  href={`mailto:${brand.email}`}
+                  className="text-[0.72rem] tracking-[0.06em] text-muted-foreground transition-colors hover:text-foreground"
+                >
+                  {brand.email}
+                </a>
+              </li>
+              <li className="text-[0.72rem] tracking-[0.06em] text-muted-foreground">
+                {brand.studio}
+              </li>
+            </ul>
+            <div className="mt-6">
+              <Newsletter compact />
+            </div>
+          </div>
         </div>
-      </div>
-    </footer>
+
+        {/* Bottom bar */}
+        <div className="mt-14 border-t border-border pt-6">
+          <p className="text-[0.6rem] tracking-[0.2em] uppercase text-muted-foreground">
+            © 2026 {brand.name}, All Rights Reserved
+          </p>
+        </div>
+      </footer>
+    </>
   );
 }
