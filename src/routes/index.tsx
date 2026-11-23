@@ -55,52 +55,121 @@ function useParallax(strength = 0.18) {
   return { ref, offset };
 }
 
+const heroSlides = [
+  {
+    image: imagery.hero,
+    alt: "OG CULT campaign — figure in an underground car park at night",
+    kicker: "Vol. 01 — Nightshift",
+    headline: "Wear Become OG",
+    sub: "Black Label Drop",
+  },
+  {
+    image: imagery.editorial,
+    alt: "OG CULT editorial campaign — figures on a rain-soaked street at night",
+    kicker: "Limited Run",
+    headline: "Not Made For Everyone",
+    sub: "Underground Luxury",
+  },
+];
+
 function HomePage() {
   const { data, isLoading } = useQuery(productsQueryOptions());
   const featured = sortProductsForDisplay(data ?? []);
-  const hero = useParallax(0.12);
   const editorial = useParallax(0.2);
+  const [slide, setSlide] = useState(0);
+  
+    const currentSlide = heroSlides[slide] ?? heroSlides[0]!;
+  const nextSlide = () => setSlide((s) => (s + 1) % heroSlides.length);
+  const prevSlide = () => setSlide((s) => (s - 1 + heroSlides.length) % heroSlides.length);
 
   return (
     <>
-      {/* HERO */}
-      <section className="relative flex h-[100svh] min-h-[560px] items-end overflow-hidden">
-        <div ref={hero.ref} className="absolute inset-0">
-          <img
-            src={imagery.hero}
-            alt="OG CULT campaign — figure in an underground car park at night"
-            className="h-[115%] w-full object-cover object-center"
-            style={{ transform: `translate3d(0, ${hero.offset}px, 0) scale(1.02)` }}
-          />
-          {/* Cinematic mood, but the campaign image stays readable */}
-          <div className="absolute inset-0 bg-background/20" />
-          {/* Gradient scrim behind the copy for legibility */}
-          <div className="absolute inset-x-0 bottom-0 h-[72%] bg-gradient-to-t from-background via-background/75 to-transparent" />
+      {/* HERO CAROUSEL */}
+      <section className="relative h-[100svh] min-h-[560px] w-full overflow-hidden bg-background">
+        {/* Slides */}
+        <div className="absolute inset-0">
+          {heroSlides.map((s, i) => (
+            <div
+              key={s.image}
+              className={`absolute inset-0 transition-opacity duration-1000 ease-[cubic-bezier(0.16,1,0.3,1)] ${
+                i === slide ? "opacity-100" : "opacity-0"
+              }`}
+            >
+              <img
+                src={s.image}
+                alt={s.alt}
+                className="h-full w-full object-cover object-center"
+              />
+              {/* Cinematic mood, but the campaign image stays readable */}
+              <div className="absolute inset-0 bg-background/20" />
+              {/* Gradient scrim behind the copy for legibility */}
+              <div className="absolute inset-x-0 bottom-0 h-[72%] bg-gradient-to-t from-background via-background/75 to-transparent" />
+            </div>
+          ))}
         </div>
 
-        <div className="relative w-full px-5 pb-16 md:px-10 md:pb-24">
-          
-          <h1 className="display-hero flex items-center gap-4 md:gap-6">
-            <span className="flex flex-col items-end text-right leading-[0.95] text-[0.62em]">
-              <span>Wear</span>
-              <span>Become</span>
-            </span>
-            <span aria-hidden className="h-[1.15em] w-[3px] shrink-0 bg-foreground/70 md:w-[4px]" />
-            <span>OG</span>
-          </h1>
+        {/* Content — asymmetric, left-aligned */}
+        <div className="relative z-10 flex h-full flex-col justify-end px-5 pb-16 md:px-10 md:pb-24">
+          <div className="max-w-4xl">
+            <p className="label">{currentSlide.kicker}</p>
+            <h1 className="display-hero mt-6 flex items-center gap-4 md:gap-6">
+              <span className="flex flex-col items-end text-right leading-[0.95] text-[0.62em]">
+                <span>Wear</span>
+                <span>Become</span>
+              </span>
+              <span aria-hidden className="h-[1.15em] w-[3px] shrink-0 bg-foreground/70 md:w-[4px]" />
+              <span>OG</span>
+            </h1>
+            <p className="mt-4 font-display text-2xl uppercase tracking-tight text-foreground/80 md:text-3xl">
+              {currentSlide.sub}
+            </p>
+          </div>
+        </div>
 
-          <div className="mt-11 flex flex-wrap items-center gap-x-8 gap-y-4">
-            <Link to="/shop" className="btn-cult">
-              Shop the drop
-            </Link>
-            <Link to="/about" className="nav-link !text-foreground/70">
-              Explore OG Cult
-            </Link>
-          </div>
-          <div className="mt-16 flex items-center gap-4">
-            <span className="label">Scroll</span>
-            <span className="h-px w-16 origin-left animate-pulse bg-border" />
-          </div>
+        {/* Accent callout — bottom-right, links to /shop */}
+        <Link
+          to="/shop"
+          className="absolute bottom-16 right-5 z-10 flex flex-col items-end text-right md:bottom-24 md:right-10"
+        >
+          <span className="label !text-foreground/70">New Season</span>
+          <span className="mt-2 font-display text-3xl uppercase leading-none text-blood md:text-5xl">
+            Limited Drop
+          </span>
+          <span className="mt-3 h-px w-16 bg-blood md:w-24" />
+        </Link>
+
+        {/* Carousel arrows */}
+        <button
+          type="button"
+          onClick={prevSlide}
+          aria-label="Previous slide"
+          className="absolute top-1/2 left-5 z-10 flex h-11 w-11 -translate-y-1/2 items-center justify-center border border-foreground/20 bg-background/40 text-foreground backdrop-blur transition-all duration-300 hover:border-foreground hover:bg-background md:left-10"
+        >
+          ‹
+        </button>
+        <button
+          type="button"
+          onClick={nextSlide}
+          aria-label="Next slide"
+          className="absolute top-1/2 right-5 z-10 flex h-11 w-11 -translate-y-1/2 items-center justify-center border border-foreground/20 bg-background/40 text-foreground backdrop-blur transition-all duration-300 hover:border-foreground hover:bg-background md:right-10"
+        >
+          ›
+        </button>
+
+        {/* Slide indicators */}
+        <div className="absolute bottom-16 left-5 z-10 flex gap-2 md:bottom-24 md:left-10">
+          {heroSlides.map((_, i) => (
+            <button
+              key={i}
+              type="button"
+              onClick={() => setSlide(i)}
+              aria-label={`Go to slide ${i + 1}`}
+              aria-current={i === slide}
+              className={`h-1 transition-all duration-300 ${
+                i === slide ? "w-6 bg-foreground" : "w-2 bg-foreground/25"
+              }`}
+            />
+          ))}
         </div>
       </section>
 
