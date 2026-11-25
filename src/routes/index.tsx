@@ -1,11 +1,14 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
-import { useEffect, useRef, useState } from "react";
-import { Reveal } from "@/components/reveal";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { ProductGrid } from "@/components/product-card";
 import { Newsletter } from "@/components/newsletter";
-import { productsQueryOptions, sortProductsForDisplay } from "@/lib/shopify";
+import { productsQueryOptions } from "@/lib/shopify";
 import { brand, home, imagery, trustPoints } from "@/lib/site-content";
+import { Reveal } from "@/components/reveal";
+import look1 from "@/assets/p-hoodie.jpg";
+import look2 from "@/assets/p-tee.jpg";
+import look3 from "@/assets/p-cargo.jpg";
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -60,7 +63,7 @@ const heroSlides = [
     image: imagery.hero,
     alt: "OG CULT campaign — figure in an underground car park at night",
     kicker: "Vol. 01 — Nightshift",
-    headline: "Wear Become OG",
+    headline: "Wear / Become OG",
     sub: "Black Label Drop",
   },
   {
@@ -72,20 +75,52 @@ const heroSlides = [
   },
 ];
 
+type SortKey = "best" | "price-asc" | "price-desc";
+
+const sortLabels: { key: SortKey; label: string }[] = [
+  { key: "best", label: "Best match" },
+  { key: "price-asc", label: "Price: low to high" },
+  { key: "price-desc", label: "Price: high to low" },
+];
+
+const lookbook = [
+  { label: "Hoodies", image: look1, search: { filter: "Hoodies" } },
+  { label: "Oversized Tees", image: look2, search: { filter: "T-Shirts" } },
+  { label: "Sweatpants", image: look3, search: { filter: "Sweatpants" } },
+] as const;
+
 function HomePage() {
   const { data, isLoading } = useQuery(productsQueryOptions());
-  const featured = sortProductsForDisplay(data ?? []);
-  const editorial = useParallax(0.2);
   const [slide, setSlide] = useState(0);
-  
-    const currentSlide = heroSlides[slide] ?? heroSlides[0]!;
+  const [inStockOnly, setInStockOnly] = useState(false);
+  const [onSaleOnly, setOnSaleOnly] = useState(false);
+  const [sort, setSort] = useState<SortKey>("best");
+  const [sortOpen, setSortOpen] = useState(false);
+
+  const currentSlide = heroSlides[slide] ?? heroSlides[0]!;
   const nextSlide = () => setSlide((s) => (s + 1) % heroSlides.length);
   const prevSlide = () => setSlide((s) => (s - 1 + heroSlides.length) % heroSlides.length);
 
+  const editorial = useParallax(0.2);
+
+  const products = useMemo(() => {
+    let list = [...(data ?? [])];
+    if (inStockOnly) list = list.filter((p) => p.node.availableForSale);
+    if (onSaleOnly) list = list.filter((p) => p.node.compareAtPrice && parseFloat(p.node.compareAtPrice) > parseFloat(p.node.priceRange.minVariantPrice.amount));
+    if (sort === "price-asc") {
+      list.sort((a, b) => parseFloat(a.node.priceRange.minVariantPrice.amount) - parseFloat(b.node.priceRange.minVariantPrice.amount));
+    } else if (sort === "price-desc") {
+      list.sort((a, b) => parseFloat(b.node.priceRange.minVariantPrice.amount) - parseFloat(a.node.priceRange.minVariantPrice.amount));
+    }
+    return list;
+  }, [data, inStockOnly, onSaleOnly, sort]);
+
+  const activeSortLabel = sortLabels.find((s) => s.key === sort)?.label ?? "Best match";
+
   return (
     <>
-      {/* HERO CAROUSEL */}
-      <section className="relative h-[100svh] min-h-[560px] w-full overflow-hidden bg-background">
+      {/* ───────────────────────── HERO ───────────────────────── */}
+      <section className="relative h-[100svh] min-h-[560px] w-full overflow-hidden bg-foreground">
         {/* Slides */}
         <div className="absolute inset-0">
           {heroSlides.map((s, i) => (
@@ -100,27 +135,24 @@ function HomePage() {
                 alt={s.alt}
                 className="h-full w-full object-cover object-center"
               />
-              {/* Cinematic mood, but the campaign image stays readable */}
-              <div className="absolute inset-0 bg-background/20" />
-              {/* Gradient scrim behind the copy for legibility */}
-              <div className="absolute inset-x-0 bottom-0 h-[72%] bg-gradient-to-t from-background via-background/75 to-transparent" />
+              <div className="absolute inset-0 bg-foreground/25" />
+              <div className="absolute inset-x-0 bottom-0 h-[70%] bg-gradient-to-t from-foreground via-foreground/60 to-transparent" />
             </div>
           ))}
         </div>
 
-        {/* Content — asymmetric, left-aligned */}
+        {/* Asymmetric headline — bottom-left */}
         <div className="relative z-10 flex h-full flex-col justify-end px-5 pb-16 md:px-10 md:pb-24">
           <div className="max-w-4xl">
-            <p className="label">{currentSlide.kicker}</p>
-            <h1 className="display-hero mt-6 flex items-center gap-4 md:gap-6">
+            <p className="label !text-bone/80">{currentSlide.kicker}</p>
+            <h1 className="display-hero mt-5 flex items-center gap-4 text-bone md:gap-6">
               <span className="flex flex-col items-end text-right leading-[0.95] text-[0.62em]">
-                <span>Wear</span>
-                <span>Become</span>
+                <span>OG CULT</span>
               </span>
-              <span aria-hidden className="h-[1.15em] w-[3px] shrink-0 bg-foreground/70 md:w-[4px]" />
-              <span>OG</span>
+              <span aria-hidden className="h-[1.15em] w-[3px] shrink-0 bg-bone/70 md:w-[4px]" />
+              <span>{currentSlide.headline}</span>
             </h1>
-            <p className="mt-4 font-display text-2xl uppercase tracking-tight text-foreground/80 md:text-3xl">
+            <p className="mt-4 font-display text-2xl uppercase tracking-tight text-bone/80 md:text-3xl">
               {currentSlide.sub}
             </p>
           </div>
@@ -129,13 +161,14 @@ function HomePage() {
         {/* Accent callout — bottom-right, links to /shop */}
         <Link
           to="/shop"
-          className="absolute bottom-16 right-5 z-10 flex flex-col items-end text-right md:bottom-24 md:right-10"
+          className="absolute bottom-16 right-5 z-10 flex flex-col items-end text-right text-bone md:bottom-24 md:right-10"
         >
-          <span className="label !text-foreground/70">New Season</span>
-          <span className="mt-2 font-display text-3xl uppercase leading-none text-blood md:text-5xl">
-            Limited Drop
+          <span className="label !text-bone/70">New Drop</span>
+          <span className="mt-2 flex items-center gap-3 font-display text-3xl uppercase leading-none md:text-5xl">
+            Shop Now
+            <span aria-hidden className="text-bone/70">•</span>
           </span>
-          <span className="mt-3 h-px w-16 bg-blood md:w-24" />
+          <span className="mt-3 h-px w-16 bg-bone md:w-24" />
         </Link>
 
         {/* Carousel arrows */}
@@ -143,7 +176,7 @@ function HomePage() {
           type="button"
           onClick={prevSlide}
           aria-label="Previous slide"
-          className="absolute top-1/2 left-5 z-10 flex h-11 w-11 -translate-y-1/2 items-center justify-center border border-foreground/20 bg-background/40 text-foreground backdrop-blur transition-all duration-300 hover:border-foreground hover:bg-background md:left-10"
+          className="absolute top-1/2 left-5 z-10 flex h-11 w-11 -translate-y-1/2 items-center justify-center border border-bone/30 bg-foreground/30 text-bone backdrop-blur transition-all duration-300 hover:border-bone hover:bg-foreground/50 md:left-10"
         >
           ‹
         </button>
@@ -151,7 +184,7 @@ function HomePage() {
           type="button"
           onClick={nextSlide}
           aria-label="Next slide"
-          className="absolute top-1/2 right-5 z-10 flex h-11 w-11 -translate-y-1/2 items-center justify-center border border-foreground/20 bg-background/40 text-foreground backdrop-blur transition-all duration-300 hover:border-foreground hover:bg-background md:right-10"
+          className="absolute top-1/2 right-5 z-10 flex h-11 w-11 -translate-y-1/2 items-center justify-center border border-bone/30 bg-foreground/30 text-bone backdrop-blur transition-all duration-300 hover:border-bone hover:bg-foreground/50 md:right-10"
         >
           ›
         </button>
@@ -166,44 +199,121 @@ function HomePage() {
               aria-label={`Go to slide ${i + 1}`}
               aria-current={i === slide}
               className={`h-1 transition-all duration-300 ${
-                i === slide ? "w-6 bg-foreground" : "w-2 bg-foreground/25"
+                i === slide ? "w-6 bg-bone" : "w-2 bg-bone/30"
               }`}
             />
           ))}
         </div>
       </section>
 
-      {/* MARQUEE */}
-      <div className="overflow-hidden border-b border-border/60 py-4">
-        <div className="marquee-track">
-          {[0, 1].map((dup) => (
-            <span key={dup} className="flex shrink-0">
-              {home.marquee.map((m) => (
-                <span key={`${dup}-${m}`} className="label mx-6">
-                  {m} —
-                </span>
-              ))}
-            </span>
-          ))}
-        </div>
-      </div>
+      {/* ───────────────────── PRODUCT SHOWCASE ───────────────────── */}
+      <section className="bg-background px-5 pt-16 pb-20 md:px-10 md:pt-24 md:pb-28">
+        <Reveal className="flex flex-wrap items-end justify-between gap-4">
+          <div>
+            <span className="block h-px w-10 bg-border" />
+            <h2 className="display-md mt-6">{home.dropTitle}</h2>
+            <p className="mt-5 max-w-md text-sm leading-relaxed tracking-[0.06em] text-muted-foreground uppercase">
+              {home.dropSub}
+            </p>
+          </div>
+        </Reveal>
 
-      {/* HERO → PRODUCTS TRANSITION + NEW DROP */}
-      <section className="px-5 pt-32 pb-24 md:px-10 md:pt-56 md:pb-32">
-        <Reveal className="max-w-4xl">
-          <span className="block h-px w-14 bg-border" />
-          <h2 className="display-md mt-10">{home.dropTitle}</h2>
-          <p className="mt-7 max-w-md text-sm leading-relaxed tracking-[0.06em] text-muted-foreground uppercase">
-            {home.dropSub}
-          </p>
-        </Reveal>
-        <Reveal className="mt-20 md:mt-28" delay={80}>
-          <ProductGrid products={featured} isLoading={isLoading} emptyState="placeholder" />
-        </Reveal>
+        {/* Filter | Sort bar */}
+        <div className="mt-10 flex flex-wrap items-center justify-between gap-4 border-y border-border py-4">
+          {/* Filters */}
+          <div className="flex flex-wrap items-center gap-4">
+            <label className="flex cursor-pointer items-center gap-2 text-[0.65rem] tracking-[0.16em] uppercase text-muted-foreground transition-colors hover:text-foreground">
+              <input
+                type="checkbox"
+                checked={inStockOnly}
+                onChange={(e) => setInStockOnly(e.target.checked)}
+                className="h-3.5 w-3.5 accent-foreground"
+              />
+              In stock only
+            </label>
+            <span className="h-3 w-px bg-border" />
+            <label className="flex cursor-pointer items-center gap-2 text-[0.65rem] tracking-[0.16em] uppercase text-muted-foreground transition-colors hover:text-foreground">
+              <input
+                type="checkbox"
+                checked={onSaleOnly}
+                onChange={(e) => setOnSaleOnly(e.target.checked)}
+                className="h-3.5 w-3.5 accent-foreground"
+              />
+              On sale
+            </label>
+          </div>
+
+          {/* Sort */}
+          <div className="relative">
+            <button
+              type="button"
+              onClick={() => setSortOpen((v) => !v)}
+              className="flex items-center gap-2 text-[0.65rem] tracking-[0.16em] uppercase text-muted-foreground transition-colors hover:text-foreground"
+            >
+              Sort: <span className="text-foreground">{activeSortLabel}</span>
+              <span className={`transition-transform duration-300 ${sortOpen ? "rotate-180" : ""}`}>▾</span>
+            </button>
+            {sortOpen && (
+              <>
+                <div className="fixed inset-0 z-10" onClick={() => setSortOpen(false)} />
+                <div className="absolute right-0 top-full z-20 mt-2 w-56 border border-border bg-popover py-1 shadow-lg">
+                  {sortLabels.map((s) => (
+                    <button
+                      key={s.key}
+                      type="button"
+                      onClick={() => {
+                        setSort(s.key);
+                        setSortOpen(false);
+                      }}
+                      className={`block w-full px-4 py-2.5 text-left text-[0.65rem] tracking-[0.14em] uppercase transition-colors hover:bg-secondary ${
+                        sort === s.key ? "text-foreground" : "text-muted-foreground"
+                      }`}
+                    >
+                      {s.label}
+                    </button>
+                  ))}
+                </div>
+              </>
+            )}
+          </div>
+        </div>
+
+        {/* Grid */}
+        <div className="mt-10">
+          <ProductGrid products={products} isLoading={isLoading} emptyState="placeholder" />
+        </div>
       </section>
 
-      {/* EDITORIAL CAMPAIGN */}
-      <section className="relative flex h-[85svh] min-h-[460px] items-center justify-center overflow-hidden">
+      {/* ─────────────────── CATEGORY LOOKBOOK STRIP ─────────────────── */}
+      <section className="bg-background pb-20 md:pb-28">
+        <div className="flex gap-1 overflow-x-auto px-5 no-scrollbar md:px-10">
+          {lookbook.map((cat) => (
+            <Link
+              key={cat.label}
+              to="/shop"
+              search={cat.search}
+              className="group relative aspect-[3/4] h-[68vh] min-h-[420px] max-h-[640px] w-[78vw] shrink-0 overflow-hidden bg-muted sm:w-[46vw] md:w-[23vw] lg:w-[23.5vw]"
+            >
+              <img
+                src={cat.image}
+                alt={cat.label}
+                loading="lazy"
+                className="h-full w-full object-cover transition-transform duration-[1200ms] ease-[cubic-bezier(0.16,1,0.3,1)] group-hover:scale-105"
+              />
+              <div className="absolute inset-0 bg-gradient-to-t from-foreground/70 via-foreground/10 to-transparent" />
+              <div className="absolute bottom-6 left-5 flex items-center gap-2 text-bone md:bottom-7 md:left-6">
+                <span className="font-display text-2xl uppercase leading-none md:text-3xl">
+                  {cat.label}
+                </span>
+                <span aria-hidden className="text-xl md:text-2xl">›</span>
+              </div>
+            </Link>
+          ))}
+        </div>
+      </section>
+
+      {/* ───────────────────── EDITORIAL CAMPAIGN ───────────────────── */}
+      <section className="relative flex h-[85svh] min-h-[460px] items-center justify-center overflow-hidden bg-foreground">
         <div ref={editorial.ref} className="absolute inset-0">
           <img
             src={imagery.editorial}
@@ -212,18 +322,18 @@ function HomePage() {
             className="h-[120%] w-full object-cover"
             style={{ transform: `translate3d(0, ${editorial.offset}px, 0)` }}
           />
-          <div className="absolute inset-0 bg-background/55" />
+          <div className="absolute inset-0 bg-foreground/55" />
         </div>
-        <Reveal className="relative px-5 text-center">
+        <Reveal className="relative px-5 text-center text-bone">
           <h2 className="display-lg max-w-[14ch]">{home.editorialHeadline}</h2>
-          <Link to="/shop" className="btn-ghost-cult mt-10">
+          <Link to="/shop" className="btn-ghost-cult mt-10 !border-bone/40 !text-bone hover:!border-bone hover:!bg-bone/10">
             Explore the collection
           </Link>
         </Reveal>
       </section>
 
-      {/* TRUST */}
-      <section className="grid gap-8 border-b border-border/60 px-5 py-14 md:grid-cols-3 md:px-10">
+      {/* ───────────────────── TRUST ───────────────────── */}
+      <section className="grid gap-8 border-b border-border px-5 py-14 md:grid-cols-3 md:px-10">
         {trustPoints.map((t) => (
           <div key={t.title}>
             <p className="label !text-foreground">{t.title}</p>
@@ -232,7 +342,7 @@ function HomePage() {
         ))}
       </section>
 
-      {/* INSTAGRAM */}
+      {/* ───────────────────── INSTAGRAM ───────────────────── */}
       <section className="px-5 py-20 md:px-10 md:py-28">
         <Reveal className="flex flex-wrap items-end justify-between gap-4">
           <h2 className="display-lg">Follow the cult</h2>
@@ -265,8 +375,8 @@ function HomePage() {
         </div>
       </section>
 
-      {/* NEWSLETTER */}
-      <section className="border-t border-border/60 px-5 py-20 md:px-10 md:py-28">
+      {/* ───────────────────── NEWSLETTER ───────────────────── */}
+      <section className="border-t border-border px-5 py-20 md:px-10 md:py-28">
         <Newsletter />
       </section>
     </>

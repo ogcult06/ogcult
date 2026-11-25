@@ -1,20 +1,35 @@
 import { Link, useNavigate } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
-import { Search, ShoppingBag, User, Menu, X, ChevronRight, Truck, CreditCard, Headphones, ShieldCheck } from "lucide-react";
+import {
+  Search,
+  ShoppingBag,
+  User,
+  Menu,
+  X,
+  ChevronRight,
+  Truck,
+  Banknote,
+  Headphones,
+  ShieldCheck,
+} from "lucide-react";
 import { useCartStore } from "@/stores/cartStore";
 import { SearchOverlay } from "@/components/search-overlay";
 import { Newsletter } from "@/components/newsletter";
 import { brand } from "@/lib/site-content";
 
-const navItems = [
-  { to: "/", label: "Home", search: {} },
-  { to: "/shop", label: "Shop All", search: {} },
-  { to: "/shop", label: "Hoodies", search: { filter: "Hoodies" } },
-  { to: "/shop", label: "Sweatshirts", search: { filter: "Sweatshirts" } },
-  { to: "/shop", label: "T-Shirts", search: { filter: "T-Shirts" } },
-  { to: "/shop", label: "Sweatpants", search: { filter: "Sweatpants" } },
-  { to: "/shop", label: "Caps", search: { filter: "Caps" } },
-  { to: "/shop", label: "Collections", search: { filter: "Collections" } },
+type DrawerTab = "Menswear" | "Womenswear";
+
+const drawerCategories = [
+  { label: "Shop All", to: "/shop", search: {} },
+  { label: "Oversized Hoodies", to: "/shop", search: { filter: "Hoodies" } },
+  { label: "Oversized Sweatshirts", to: "/shop", search: { filter: "Sweatshirts" } },
+  { label: "Oversized T-Shirts", to: "/shop", search: { filter: "T-Shirts" } },
+  { label: "Sweatpants", to: "/shop", search: { filter: "Sweatpants" } },
+] as const;
+
+const collections = [
+  { label: "Vol. 01 — Nightshift", to: "/shop", search: { filter: "New Drop" } },
+  { label: "Black Label", to: "/shop", search: {} },
 ] as const;
 
 export function SiteHeader() {
@@ -24,6 +39,7 @@ export function SiteHeader() {
   const [menuOpen, setMenuOpen] = useState(false);
   const [searchOpen, setSearchOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
+  const [drawerTab, setDrawerTab] = useState<DrawerTab>("Menswear");
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 40);
@@ -39,6 +55,9 @@ export function SiteHeader() {
     };
   }, [menuOpen]);
 
+  // Transparent over the hero, crisp solid white once scrolled.
+  const onDark = !scrolled && !menuOpen;
+
   const handleSignOut = async () => {
     const { supabase } = await import("@/integrations/supabase/client");
     await supabase.auth.signOut();
@@ -48,89 +67,91 @@ export function SiteHeader() {
   return (
     <>
       <header
-        className={`fixed inset-x-0 top-0 z-50 transition-all duration-700 ease-[cubic-bezier(0.16,1,0.3,1)] ${
+        className={`fixed inset-x-0 top-0 z-50 transition-all duration-500 ease-[cubic-bezier(0.16,1,0.3,1)] ${
           scrolled || menuOpen
-            ? "border-b border-border/70 bg-background/95 backdrop-blur-xl"
-            : "border-b border-transparent bg-gradient-to-b from-background/60 to-transparent"
+            ? "border-b border-border bg-background/95 backdrop-blur-xl"
+            : "border-b border-transparent bg-transparent"
         }`}
+        style={
+          onDark
+            ? { color: "var(--color-bone)" }
+            : { color: "var(--color-foreground)" }
+        }
       >
         <div
-          className={`grid grid-cols-[auto_1fr_auto] items-center px-5 transition-[padding] duration-700 ease-[cubic-bezier(0.16,1,0.3,1)] md:px-10 ${
-            scrolled ? "py-3.5 md:py-4" : "py-5 md:py-7"
+          className={`grid grid-cols-[auto_1fr_auto] items-center px-5 transition-[padding] duration-500 ease-[cubic-bezier(0.16,1,0.3,1)] md:px-10 ${
+            scrolled ? "py-3.5 md:py-4" : "py-5 md:py-6"
           }`}
         >
           {/* Left: Hamburger + Wordmark */}
-          <div className="flex items-center gap-6">
+          <div className="flex items-center gap-5">
             <button
               type="button"
               aria-label={menuOpen ? "Close menu" : "Open menu"}
               aria-expanded={menuOpen}
               onClick={() => setMenuOpen((v) => !v)}
-              className="flex h-10 w-10 items-center justify-center rounded-full bg-transparent transition-colors hover:bg-accent md:hidden"
+              className="flex h-9 w-9 items-center justify-center transition-opacity hover:opacity-60"
             >
               {menuOpen ? (
-                <X className="h-5 w-5" strokeWidth={2.5} />
+                <X className="h-[1.15rem] w-[1.15rem]" strokeWidth={2} />
               ) : (
-                <Menu className="h-5 w-5" strokeWidth={2.5} />
+                <Menu className="h-[1.15rem] w-[1.15rem]" strokeWidth={2} />
               )}
             </button>
             <Link
               to="/"
               aria-label={`${brand.name} — home`}
-              className="font-logo !text-foreground text-2xl leading-none tracking-[0.18em] uppercase transition-opacity duration-500 hover:opacity-70"
+              className="font-logo text-xl leading-none tracking-[0.16em] uppercase transition-opacity duration-500 hover:opacity-70"
             >
               {brand.name}
             </Link>
           </div>
 
-          {/* Center: Empty on desktop, logo on mobile (hidden when menu open) */}
+          {/* Center spacer */}
           <div className="hidden md:block" />
 
           {/* Right: Search, Account, Cart */}
-          <div className="flex items-center justify-end gap-3 md:gap-5">
-            {/* Search Trigger */}
+          <div className="flex items-center justify-end gap-3 md:gap-4">
             <button
               type="button"
               onClick={() => setSearchOpen(true)}
               aria-label="Search"
-              className="flex h-10 w-10 items-center justify-center rounded-full bg-transparent transition-colors hover:bg-accent md:hidden"
+              className="flex h-9 w-9 items-center justify-center transition-opacity hover:opacity-60 md:hidden"
             >
-              <Search className="h-5 w-5" strokeWidth={2} />
+              <Search className="h-[1.15rem] w-[1.15rem]" strokeWidth={2} />
             </button>
             <button
               type="button"
               onClick={() => setSearchOpen(true)}
               aria-label="Search"
-              className="hidden md:flex items-center gap-2 rounded-full border border-border/60 bg-background/50 px-4 py-2 text-[0.65rem] tracking-[0.2em] uppercase transition-all duration-300 hover:border-foreground hover:bg-background"
+              className={`hidden md:flex items-center gap-2 rounded-full px-4 py-2 text-[0.65rem] tracking-[0.18em] uppercase transition-all duration-300 ${
+                onDark
+                  ? "border border-current/25 bg-current/10 backdrop-blur hover:bg-current/20"
+                  : "border border-border bg-secondary hover:bg-accent"
+              }`}
             >
-              <Search className="h-4 w-4" strokeWidth={2} />
+              <Search className="h-3.5 w-3.5" strokeWidth={2} />
               <span>Search</span>
             </button>
 
-            {/* Account */}
             <Link
               to="/contact"
               aria-label="Account"
-              className="flex h-10 w-10 items-center justify-center rounded-full bg-transparent transition-colors hover:bg-accent"
+              className="flex h-9 w-9 items-center justify-center transition-opacity hover:opacity-60"
             >
-              <User className="h-5 w-5" strokeWidth={2} />
+              <User className="h-[1.15rem] w-[1.15rem]" strokeWidth={2} />
             </Link>
 
-            {/* Cart */}
             <button
               type="button"
               onClick={openDrawer}
               aria-label={`Open cart, ${count} items`}
-              className="relative flex h-10 w-10 items-center justify-center rounded-full bg-transparent transition-colors hover:bg-accent"
+              className="relative flex h-9 items-center gap-1.5 px-1 transition-opacity hover:opacity-60"
             >
-              <ShoppingBag className="h-5 w-5" strokeWidth={2} />
-              {count > 0 && (
-                <span
-                  className="absolute -top-1 -right-1 flex h-5 w-5 items-center justify-center text-[0.55rem] font-medium leading-none bg-blood text-bone rounded-full"
-                >
-                  {count > 99 ? "99+" : count}
-                </span>
-              )}
+              <ShoppingBag className="h-[1.15rem] w-[1.15rem]" strokeWidth={2} />
+              <span className="text-[0.65rem] tracking-[0.18em] uppercase">
+                Bag {count}
+              </span>
             </button>
           </div>
         </div>
@@ -138,72 +159,135 @@ export function SiteHeader() {
 
       {/* Slide-out Navigation Drawer */}
       <div
-        className={`fixed inset-0 z-[60] flex flex-col transition-all duration-500 ease-[cubic-bezier(0.16,1,0.3,1)] ${
+        className={`fixed inset-0 z-[60] transition-all duration-500 ease-[cubic-bezier(0.16,1,0.3,1)] ${
           menuOpen ? "pointer-events-auto opacity-100" : "pointer-events-none opacity-0"
         }`}
         aria-hidden={!menuOpen}
       >
         {/* Backdrop */}
         <div
-          className="absolute inset-0 bg-background/95 backdrop-blur-xl"
+          className="absolute inset-0 bg-foreground/30 backdrop-blur-sm"
           onClick={() => setMenuOpen(false)}
         />
 
-        {/* Drawer Content */}
+        {/* Drawer panel */}
         <aside
-          className="relative flex flex-col w-full max-w-sm border-r border-border bg-background p-6 pt-20"
+          className={`absolute left-0 top-0 flex h-full w-full max-w-[420px] flex-col border-r border-border bg-background text-foreground transition-transform duration-500 ease-[cubic-bezier(0.16,1,0.3,1)] ${
+            menuOpen ? "translate-x-0" : "-translate-x-full"
+          }`}
         >
-          {/* Close Button */}
-          <button
-            type="button"
-            onClick={() => setMenuOpen(false)}
-            aria-label="Close menu"
-            className="absolute top-6 right-6 flex h-10 w-10 items-center justify-center rounded-full bg-transparent transition-colors hover:bg-accent"
-          >
-            <X className="h-5 w-5" strokeWidth={2.5} />
-          </button>
+          {/* Top bar */}
+          <div className="flex items-center justify-between px-6 pt-6">
+            <span className="label !text-foreground">Menu</span>
+            <button
+              type="button"
+              onClick={() => setMenuOpen(false)}
+              aria-label="Close menu"
+              className="flex h-9 w-9 items-center justify-center transition-opacity hover:opacity-60"
+            >
+              <X className="h-5 w-5" strokeWidth={2} />
+            </button>
+          </div>
 
-          {/* Navigation Links */}
-          <nav aria-label="Main navigation" className="flex-1 flex flex-col gap-1">
-            {navItems.map((item) => (
+          {/* Tabs */}
+          <div className="mt-6 flex gap-1 border-b border-border px-6">
+            {(["Menswear", "Womenswear"] as DrawerTab[]).map((tab) => (
+              <button
+                key={tab}
+                type="button"
+                onClick={() => setDrawerTab(tab)}
+                className={`relative pb-3 text-[0.7rem] tracking-[0.2em] uppercase transition-colors ${
+                  drawerTab === tab
+                    ? "text-foreground"
+                    : "text-muted-foreground hover:text-foreground"
+                }`}
+              >
+                {tab}
+                {drawerTab === tab && (
+                  <span className="absolute inset-x-0 -bottom-px h-px bg-foreground" />
+                )}
+              </button>
+            ))}
+          </div>
+
+          {/* Categories */}
+          <nav
+            aria-label={`${drawerTab} navigation`}
+            className="flex-1 flex flex-col gap-0 overflow-y-auto px-6 py-6"
+          >
+            {drawerCategories.map((item) => (
               <Link
                 key={item.label}
                 to={item.to}
                 search={item.search}
                 onClick={() => setMenuOpen(false)}
-                className="group flex items-center gap-4 px-2 py-4 font-display text-2xl uppercase text-foreground transition-colors hover:opacity-60"
+                className="group flex items-center justify-between border-b border-border/60 py-4 font-display text-2xl uppercase text-foreground transition-colors hover:text-muted-foreground"
               >
                 {item.label}
-                <ChevronRight className="h-5 w-5 opacity-0 group-hover:opacity-100 transition-opacity" strokeWidth={2} />
+                <ChevronRight
+                  className="h-4 w-4 -translate-x-2 opacity-0 transition-all duration-300 group-hover:translate-x-0 group-hover:opacity-100"
+                  strokeWidth={2}
+                />
               </Link>
             ))}
 
-            {/* Account Link */}
-            <Link
-              to="/contact"
-              onClick={() => setMenuOpen(false)}
-              className="group flex items-center gap-4 px-2 py-4 font-display text-2xl uppercase text-foreground transition-colors hover:opacity-60"
-            >
-              Account
-              <ChevronRight className="h-5 w-5 opacity-0 group-hover:opacity-100 transition-opacity" strokeWidth={2} />
-            </Link>
-
-            {/* Sign Out (if authenticated) - placeholder for future auth state */}
+            {/* Collections */}
+            <p className="label mt-8 mb-3">Collections</p>
+            {collections.map((item) => (
+              <Link
+                key={item.label}
+                to={item.to}
+                search={item.search}
+                onClick={() => setMenuOpen(false)}
+                className="group flex items-center justify-between border-b border-border/60 py-4 text-[0.85rem] tracking-[0.14em] uppercase text-foreground transition-colors hover:text-muted-foreground"
+              >
+                {item.label}
+                <ChevronRight
+                  className="h-4 w-4 -translate-x-2 opacity-0 transition-all duration-300 group-hover:translate-x-0 group-hover:opacity-100"
+                  strokeWidth={2}
+                />
+              </Link>
+            ))}
           </nav>
 
-          {/* Social Links */}
-          <div className="mt-8 flex gap-6 border-t border-border/60 pt-6">
-            {brand.socials.map((s) => (
-              <a
-                key={s.label}
-                href={s.href}
-                target="_blank"
-                rel="noreferrer"
+          {/* Footer links */}
+          <div className="border-t border-border px-6 py-5">
+            <div className="flex items-center gap-5">
+              <Link
+                to="/contact"
+                onClick={() => setMenuOpen(false)}
                 className="label transition-colors hover:!text-foreground"
               >
-                {s.label}
-              </a>
-            ))}
+                Account
+              </Link>
+              <Link
+                to="/about"
+                onClick={() => setMenuOpen(false)}
+                className="label transition-colors hover:!text-foreground"
+              >
+                About
+              </Link>
+              <Link
+                to="/contact"
+                onClick={() => setMenuOpen(false)}
+                className="label transition-colors hover:!text-foreground"
+              >
+                Contact
+              </Link>
+            </div>
+            <div className="mt-4 flex gap-5">
+              {brand.socials.map((s) => (
+                <a
+                  key={s.label}
+                  href={s.href}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="label transition-colors hover:!text-foreground"
+                >
+                  {s.label}
+                </a>
+              ))}
+            </div>
           </div>
         </aside>
       </div>
@@ -214,146 +298,168 @@ export function SiteHeader() {
 }
 
 export function SiteFooter() {
-  const policies = [
+  const [activeTab, setActiveTab] = useState(0);
+
+  const policyTabs = [
     {
-      title: "Free Shipping",
       icon: Truck,
-      content:
-        "Free shipping across India on all orders. Orders placed before 2 PM IST ship the same day and dispatch within 24 hours.",
+      title: "Free shipping",
+      body: "Orders placed before 4 PM IST dispatch the same day. Free standard shipping across India — no minimum order.",
     },
     {
-      title: "Cash on Delivery",
-      icon: CreditCard,
-      content:
-        "Pay in cash at your doorstep. Available on all orders — no advance payment required. Please keep exact change ready.",
+      icon: Banknote,
+      title: "Cash on delivery",
+      body: "Pay in cash when your order arrives. Available pan-India on orders up to ₹15,000. No advance payment required.",
     },
     {
-      title: "Priority Support",
       icon: Headphones,
-      content:
-        "Our support team responds within 2 hours on business days. Reach us at support@ogcult.store for any order queries.",
+      title: "Priority support",
+      body: "Reach our team 7 days a week via email or WhatsApp. Every query is answered within 12 hours.",
     },
     {
-      title: "OG Cult's Promise",
       icon: ShieldCheck,
-      content:
-        "Every piece is built in limited runs. If you're not satisfied, easy replacements or full refunds within 30 days.",
+      title: "OG Cult's promise",
+      body: "Easy replacements within 14 days on unworn items. If anything arrives off, we make it right at no cost to you.",
     },
   ];
 
   return (
-    <footer className="bg-white px-5 pb-10 pt-16 md:px-10">
-      {/* Policy Tabs */}
-      <div className="border-b border-gray-100">
-        <div className="grid grid-cols-2 gap-4 md:grid-cols-4">
-          {policies.map((p) => (
-            <div key={p.title} className="flex flex-col items-center gap-2 text-center">
-              <p.icon className="h-6 w-6 text-[#111111]" strokeWidth={1.5} />
-              <p className="text-sm font-semibold text-[#111111]">{p.title}</p>
-              <p className="text-xs leading-relaxed text-gray-500">{p.content}</p>
+    <>
+      {/* ───────── Policy info tabs ───────── */}
+      <section className="border-t border-border bg-background">
+        <div className="grid grid-cols-2 md:grid-cols-4">
+          {policyTabs.map((tab, i) => {
+            const isActive = activeTab === i;
+            return (
+              <button
+                key={tab.title}
+                type="button"
+                onClick={() => setActiveTab(i)}
+                className={`flex flex-col items-start gap-3 border-b border-border px-5 py-6 text-left transition-colors md:px-8 md:py-8 ${
+                  i < policyTabs.length - 1 ? "md:border-r" : ""
+                } ${i % 2 === 0 ? "border-r md:border-r" : ""} ${
+                  isActive ? "bg-secondary" : "hover:bg-secondary/50"
+                }`}
+              >
+                <tab.icon className="h-6 w-6 text-foreground" strokeWidth={1.5} />
+                <span className="text-[0.72rem] font-semibold tracking-[0.14em] uppercase text-foreground">
+                  {tab.title}
+                </span>
+                <span
+                  className={`overflow-hidden text-[0.7rem] leading-relaxed text-muted-foreground transition-all duration-300 ${
+                    isActive ? "mt-0 max-h-40 opacity-100" : "max-h-0 opacity-0"
+                  }`}
+                >
+                  {tab.body}
+                </span>
+              </button>
+            );
+          })}
+        </div>
+      </section>
+
+      {/* ───────── 4-column footer ───────── */}
+      <footer className="border-t border-border bg-background px-5 pt-16 pb-8 md:px-10 md:pt-20">
+        <div className="grid gap-10 md:grid-cols-4">
+          {/* OG CULT */}
+          <div>
+            <p className="font-logo text-lg tracking-[0.16em] uppercase text-foreground">
+              {brand.name}
+            </p>
+            <ul className="mt-5 space-y-3">
+              <li>
+                <Link to="/about" className="text-[0.72rem] tracking-[0.1em] uppercase text-muted-foreground transition-colors hover:text-foreground">
+                  About
+                </Link>
+              </li>
+              <li>
+                <Link to="/size-guide" className="text-[0.72rem] tracking-[0.1em] uppercase text-muted-foreground transition-colors hover:text-foreground">
+                  Sizing Guide
+                </Link>
+              </li>
+              <li>
+                <Link to="/shop" className="text-[0.72rem] tracking-[0.1em] uppercase text-muted-foreground transition-colors hover:text-foreground">
+                  Shop All
+                </Link>
+              </li>
+            </ul>
+          </div>
+
+          {/* Social */}
+          <div>
+            <p className="text-[0.62rem] tracking-[0.28em] uppercase text-muted-foreground">Social</p>
+            <ul className="mt-5 space-y-3">
+              {brand.socials.map((s) => (
+                <li key={s.label}>
+                  <a
+                    href={s.href}
+                    target="_blank"
+                    rel="noreferrer"
+                    className="text-[0.72rem] tracking-[0.1em] uppercase text-muted-foreground transition-colors hover:text-foreground"
+                  >
+                    {s.label}
+                  </a>
+                </li>
+              ))}
+            </ul>
+          </div>
+
+          {/* Legal */}
+          <div>
+            <p className="text-[0.62rem] tracking-[0.28em] uppercase text-muted-foreground">Legal</p>
+            <ul className="mt-5 space-y-3">
+              <li>
+                <Link to="/privacy" className="text-[0.72rem] tracking-[0.1em] uppercase text-muted-foreground transition-colors hover:text-foreground">
+                  Privacy Policy
+                </Link>
+              </li>
+              <li>
+                <Link to="/shipping-returns" className="text-[0.72rem] tracking-[0.1em] uppercase text-muted-foreground transition-colors hover:text-foreground">
+                  Cancellation & Refund
+                </Link>
+              </li>
+              <li>
+                <Link to="/shipping-returns" className="text-[0.72rem] tracking-[0.1em] uppercase text-muted-foreground transition-colors hover:text-foreground">
+                  Shipping & Exchange
+                </Link>
+              </li>
+              <li>
+                <Link to="/terms" className="text-[0.72rem] tracking-[0.1em] uppercase text-muted-foreground transition-colors hover:text-foreground">
+                  Terms & Conditions
+                </Link>
+              </li>
+            </ul>
+          </div>
+
+          {/* Contact Us */}
+          <div>
+            <p className="text-[0.62rem] tracking-[0.28em] uppercase text-muted-foreground">Contact Us</p>
+            <ul className="mt-5 space-y-3">
+              <li>
+                <a
+                  href={`mailto:${brand.email}`}
+                  className="text-[0.72rem] tracking-[0.06em] text-muted-foreground transition-colors hover:text-foreground"
+                >
+                  {brand.email}
+                </a>
+              </li>
+              <li className="text-[0.72rem] tracking-[0.06em] text-muted-foreground">
+                {brand.studio}
+              </li>
+            </ul>
+            <div className="mt-6">
+              <Newsletter compact />
             </div>
-          ))}
-        </div>
-      </div>
-
-      {/* 4-Column Footer */}
-      <div className="mt-12 grid gap-10 md:grid-cols-4">
-        {/* OG CULT */}
-        <div>
-          <p className="text-sm font-semibold uppercase tracking-wider text-[#111111]">OG CULT</p>
-          <ul className="mt-5 space-y-3">
-            <li>
-              <Link to="/about" className="text-sm text-gray-500 transition-colors hover:text-[#111111]">
-                About
-              </Link>
-            </li>
-            <li>
-              <Link to="/size-guide" className="text-sm text-gray-500 transition-colors hover:text-[#111111]">
-                Sizing Guide
-              </Link>
-            </li>
-            <li>
-              <Link to="/shop" className="text-sm text-gray-500 transition-colors hover:text-[#111111]">
-                Shop All
-              </Link>
-            </li>
-          </ul>
+          </div>
         </div>
 
-        {/* Social */}
-        <div>
-          <p className="text-sm font-semibold uppercase tracking-wider text-[#111111]">Social</p>
-          <ul className="mt-5 space-y-3">
-            <li>
-              <a
-                href={brand.socials[0]?.href ?? "https://instagram.com"}
-                target="_blank"
-                rel="noreferrer"
-                className="text-sm text-gray-500 transition-colors hover:text-[#111111]"
-              >
-                Instagram
-              </a>
-            </li>
-          </ul>
+        {/* Bottom bar */}
+        <div className="mt-14 border-t border-border pt-6">
+          <p className="text-[0.6rem] tracking-[0.2em] uppercase text-muted-foreground">
+            © 2026 {brand.name}, All Rights Reserved
+          </p>
         </div>
-
-        {/* Legal */}
-        <div>
-          <p className="text-sm font-semibold uppercase tracking-wider text-[#111111]">Legal</p>
-          <ul className="mt-5 space-y-3">
-            <li>
-              <Link to="/privacy" className="text-sm text-gray-500 transition-colors hover:text-[#111111]">
-                Privacy Policy
-              </Link>
-            </li>
-            <li>
-              <Link to="/shipping-returns" className="text-sm text-gray-500 transition-colors hover:text-[#111111]">
-                Cancellation & Refund
-              </Link>
-            </li>
-            <li>
-              <Link to="/shipping-returns" className="text-sm text-gray-500 transition-colors hover:text-[#111111]">
-                Shipping & Exchange
-              </Link>
-            </li>
-            <li>
-              <Link to="/terms" className="text-sm text-gray-500 transition-colors hover:text-[#111111]">
-                Terms & Conditions
-              </Link>
-            </li>
-          </ul>
-        </div>
-
-        {/* Contact */}
-        <div>
-          <p className="text-sm font-semibold uppercase tracking-wider text-[#111111]">Contact Us</p>
-          <ul className="mt-5 space-y-3">
-            <li>
-              <a
-                href="mailto:support@ogcult.store"
-                className="text-sm text-gray-500 transition-colors hover:text-[#111111]"
-              >
-                support@ogcult.store
-              </a>
-            </li>
-          </ul>
-        </div>
-      </div>
-
-      {/* Bottom Bar */}
-      <div className="mt-12 flex flex-col items-center justify-between gap-4 border-t border-gray-100 pt-6 md:flex-row">
-        <p className="text-xs text-gray-500">
-          © 2026 OG CULT, All Rights Reserved
-        </p>
-        <div className="flex gap-6">
-          <Link to="/privacy" className="text-xs text-gray-500 transition-colors hover:text-[#111111]">
-            Privacy
-          </Link>
-          <Link to="/terms" className="text-xs text-gray-500 transition-colors hover:text-[#111111]">
-            Terms
-          </Link>
-        </div>
-      </div>
-    </footer>
+      </footer>
+    </>
   );
 }
