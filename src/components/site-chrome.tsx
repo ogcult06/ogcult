@@ -1,6 +1,6 @@
 import { Link, useNavigate } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
-import { Search, ShoppingBag, User, Menu, X, ChevronRight } from "lucide-react";
+import { Search, ShoppingBag, User, Menu, X, ChevronRight, Truck, CreditCard, Headphones, ShieldCheck } from "lucide-react";
 import { useCartStore } from "@/stores/cartStore";
 import { SearchOverlay } from "@/components/search-overlay";
 import { Newsletter } from "@/components/newsletter";
@@ -214,83 +214,142 @@ export function SiteHeader() {
 }
 
 export function SiteFooter() {
+  const policies = [
+    {
+      title: "Free Shipping",
+      icon: Truck,
+      content:
+        "Free shipping across India on all orders. Orders placed before 2 PM IST ship the same day and dispatch within 24 hours.",
+    },
+    {
+      title: "Cash on Delivery",
+      icon: CreditCard,
+      content:
+        "Pay in cash at your doorstep. Available on all orders — no advance payment required. Please keep exact change ready.",
+    },
+    {
+      title: "Priority Support",
+      icon: Headphones,
+      content:
+        "Our support team responds within 2 hours on business days. Reach us at support@ogcult.store for any order queries.",
+    },
+    {
+      title: "OG Cult's Promise",
+      icon: ShieldCheck,
+      content:
+        "Every piece is built in limited runs. If you're not satisfied, easy replacements or full refunds within 30 days.",
+    },
+  ];
+
   return (
-    <footer className="border-t border-border/60 px-5 pt-16 pb-10 md:px-10">
-      <div className="grid gap-12 md:grid-cols-[1.2fr_1fr]">
-        <div className="grid grid-cols-2 gap-10">
-          <div>
-            <p className="label">Shop</p>
-            <ul className="mt-5 space-y-3">
-              <li>
-                <Link to="/shop" className="text-xs uppercase hover:opacity-60">
-                  Shop
-                </Link>
-              </li>
-              <li>
-                <Link
-                  to="/shop"
-                  search={{ filter: "New Drop" }}
-                  className="text-xs uppercase hover:opacity-60"
-                >
-                  New Drop
-                </Link>
-              </li>
-              <li>
-                <Link to="/size-guide" className="text-xs uppercase hover:opacity-60">
-                  Size Guide
-                </Link>
-              </li>
-              <li>
-                <Link to="/shipping-returns" className="text-xs uppercase hover:opacity-60">
-                  Shipping & Returns
-                </Link>
-              </li>
-            </ul>
-          </div>
-          <div>
-            <p className="label">Brand</p>
-            <ul className="mt-5 space-y-3">
-              <li>
-                <Link to="/about" className="text-xs uppercase hover:opacity-60">
-                  About
-                </Link>
-              </li>
-              <li>
-                <Link to="/contact" className="text-xs uppercase hover:opacity-60">
-                  Contact
-                </Link>
-              </li>
-              {brand.socials.map((s) => (
-                <li key={s.label}>
-                  <a
-                    href={s.href}
-                    target="_blank"
-                    rel="noreferrer"
-                    className="text-xs uppercase hover:opacity-60"
-                  >
-                    {s.label}
-                  </a>
-                </li>
-              ))}
-            </ul>
-          </div>
+    <footer className="bg-white px-5 pb-10 pt-16 md:px-10">
+      {/* Policy Tabs */}
+      <div className="border-b border-gray-100">
+        <div className="grid grid-cols-2 gap-4 md:grid-cols-4">
+          {policies.map((p) => (
+            <div key={p.title} className="flex flex-col items-center gap-2 text-center">
+              <p.icon className="h-6 w-6 text-[#111111]" strokeWidth={1.5} />
+              <p className="text-sm font-semibold text-[#111111]">{p.title}</p>
+              <p className="text-xs leading-relaxed text-gray-500">{p.content}</p>
+            </div>
+          ))}
         </div>
-        <div className="hidden md:block">
-                  <Newsletter compact />
-                </div>
       </div>
 
-      <p aria-hidden="true" className="display-xl mt-16 text-muted-foreground/15">
-        OG Cult
-      </p>
+      {/* 4-Column Footer */}
+      <div className="mt-12 grid gap-10 md:grid-cols-4">
+        {/* OG CULT */}
+        <div>
+          <p className="text-sm font-semibold uppercase tracking-wider text-[#111111]">OG CULT</p>
+          <ul className="mt-5 space-y-3">
+            <li>
+              <Link to="/about" className="text-sm text-gray-500 transition-colors hover:text-[#111111]">
+                About
+              </Link>
+            </li>
+            <li>
+              <Link to="/size-guide" className="text-sm text-gray-500 transition-colors hover:text-[#111111]">
+                Sizing Guide
+              </Link>
+            </li>
+            <li>
+              <Link to="/shop" className="text-sm text-gray-500 transition-colors hover:text-[#111111]">
+                Shop All
+              </Link>
+            </li>
+          </ul>
+        </div>
 
-      <div className="mt-8 flex flex-col gap-4 border-t border-border/60 pt-6 md:flex-row md:items-center md:justify-between">
-        <p className="label">© {new Date().getFullYear()} OG Cult</p>
+        {/* Social */}
+        <div>
+          <p className="text-sm font-semibold uppercase tracking-wider text-[#111111]">Social</p>
+          <ul className="mt-5 space-y-3">
+            <li>
+              <a
+                href={brand.socials[0]?.href ?? "https://instagram.com"}
+                target="_blank"
+                rel="noreferrer"
+                className="text-sm text-gray-500 transition-colors hover:text-[#111111]"
+              >
+                Instagram
+              </a>
+            </li>
+          </ul>
+        </div>
+
+        {/* Legal */}
+        <div>
+          <p className="text-sm font-semibold uppercase tracking-wider text-[#111111]">Legal</p>
+          <ul className="mt-5 space-y-3">
+            <li>
+              <Link to="/privacy" className="text-sm text-gray-500 transition-colors hover:text-[#111111]">
+                Privacy Policy
+              </Link>
+            </li>
+            <li>
+              <Link to="/shipping-returns" className="text-sm text-gray-500 transition-colors hover:text-[#111111]">
+                Cancellation & Refund
+              </Link>
+            </li>
+            <li>
+              <Link to="/shipping-returns" className="text-sm text-gray-500 transition-colors hover:text-[#111111]">
+                Shipping & Exchange
+              </Link>
+            </li>
+            <li>
+              <Link to="/terms" className="text-sm text-gray-500 transition-colors hover:text-[#111111]">
+                Terms & Conditions
+              </Link>
+            </li>
+          </ul>
+        </div>
+
+        {/* Contact */}
+        <div>
+          <p className="text-sm font-semibold uppercase tracking-wider text-[#111111]">Contact Us</p>
+          <ul className="mt-5 space-y-3">
+            <li>
+              <a
+                href="mailto:support@ogcult.store"
+                className="text-sm text-gray-500 transition-colors hover:text-[#111111]"
+              >
+                support@ogcult.store
+              </a>
+            </li>
+          </ul>
+        </div>
+      </div>
+
+      {/* Bottom Bar */}
+      <div className="mt-12 flex flex-col items-center justify-between gap-4 border-t border-gray-100 pt-6 md:flex-row">
+        <p className="text-xs text-gray-500">
+          © 2026 OG CULT, All Rights Reserved
+        </p>
         <div className="flex gap-6">
-          <Link to="/privacy" className="label transition-colors hover:!text-foreground">
+          <Link to="/privacy" className="text-xs text-gray-500 transition-colors hover:text-[#111111]">
             Privacy
           </Link>
-          <Link to="/terms" className="label transition-colors hover:!text-foreground">
+          <Link to="/terms" className="text-xs text-gray-500 transition-colors hover:text-[#111111]">
             Terms
           </Link>
         </div>
