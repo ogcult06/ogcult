@@ -9,9 +9,9 @@ import { FloatingShopCta } from "@/components/floating-shop-cta";
 import { productsQueryOptions } from "@/lib/shopify";
 import { brand, home, imagery, promoHeroSlides, trustPoints } from "@/lib/site-content";
 import { Reveal } from "@/components/reveal";
-import catHoodies from "@/assets/cat-hoodies.png";
-import catTshirts from "@/assets/p-the-og-tees.jpg";
-import catJoggers from "@/assets/cat-joggers.png";
+import catHoodies from "@/assets/cat-hoodies-water.png.asset.json";
+import catTshirts from "@/assets/cat-tshirts-chained.png.asset.json";
+import catJoggers from "@/assets/cat-joggers-print.jpg.asset.json";
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -236,7 +236,7 @@ function HomePage() {
             className="group relative aspect-[5/6] overflow-hidden bg-foreground md:aspect-auto md:h-full"
           >
             <img
-              src={categoryTiles.hoodies.image}
+              src={categoryTiles.hoodies.image.url}
               alt={categoryTiles.hoodies.alt}
               loading="eager"
               className="absolute inset-0 h-full w-full object-cover object-[50%_20%] transition-transform duration-[1200ms] ease-[cubic-bezier(0.16,1,0.3,1)] group-hover:scale-105"
@@ -260,7 +260,7 @@ function HomePage() {
             className="group relative col-start-2 row-span-2 row-start-1 overflow-hidden bg-foreground"
           >
             <img
-              src={categoryTiles.joggers.image}
+              src={categoryTiles.joggers.image.url}
               alt={categoryTiles.joggers.alt}
               loading="eager"
               className="absolute inset-0 h-full w-full object-cover object-[50%_58%] transition-transform duration-[1200ms] ease-[cubic-bezier(0.16,1,0.3,1)] group-hover:scale-105"
@@ -284,7 +284,7 @@ function HomePage() {
             className="group relative aspect-[5/6] overflow-hidden bg-foreground md:aspect-auto md:h-full"
           >
             <img
-              src={categoryTiles.tshirts.image}
+              src={categoryTiles.tshirts.image.url}
               alt={categoryTiles.tshirts.alt}
               loading="eager"
               className="absolute inset-0 h-full w-full object-cover object-[50%_28%] transition-transform duration-[1200ms] ease-[cubic-bezier(0.16,1,0.3,1)] group-hover:scale-105"
