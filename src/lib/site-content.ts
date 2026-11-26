@@ -45,7 +45,7 @@ export const promoHeroSlides = [
   {
     image: heroImage,
     alt: "OG CULT streetwear promotional campaign model",
-    titleTop: "OG CULT  ",
+    titleTop: "OG CULT",
     discount: "70% OFF",
     subtitle: "Flat Discount",
     ctaLabel: "Shop Now",
