@@ -239,7 +239,7 @@ function HomePage() {
               src={categoryTiles.hoodies.image.url}
               alt={categoryTiles.hoodies.alt}
               loading="eager"
-              className="absolute inset-0 h-full w-full object-cover object-[50%_20%] transition-transform duration-[1200ms] ease-[cubic-bezier(0.16,1,0.3,1)] group-hover:scale-105"
+              className="absolute inset-0 h-full w-full object-cover object-[50%_20%] transition-transform duration-[1200ms] ease-[cubic-bezier(0.16,1,0.3,1)] group-hover:scale-105 md:object-[50%_77%] lg:object-[50%_69%]"
             />
             <div className="absolute inset-x-0 bottom-0 h-1/2 bg-gradient-to-t from-foreground/80 via-foreground/25 to-transparent" />
             <div className="absolute bottom-4 left-4 flex items-center gap-1.5 text-bone md:bottom-7 md:left-7 md:gap-2">
