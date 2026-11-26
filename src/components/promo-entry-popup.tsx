@@ -49,51 +49,51 @@ export function PromoEntryPopup({ onShopNow }: { onShopNow: () => void }) {
       role="dialog"
       aria-modal="true"
       aria-label={`${slide.titleTop} — ${slide.discount}`}
-      className="fixed inset-0 z-[70] flex items-center justify-center bg-pitch/80 p-4 backdrop-blur-sm animate-in fade-in duration-300"
+      className="fixed inset-0 z-[70] flex items-center justify-center bg-pitch/35 p-4 backdrop-blur-md animate-in fade-in duration-300"
       onClick={dismiss}
     >
       <div
-        className="relative w-full max-w-md overflow-hidden border border-bone/15 bg-pitch text-bone shadow-2xl"
+        className="relative w-full max-w-[17.5rem] overflow-hidden border border-bone/10 bg-pitch/35 text-bone shadow-[0_24px_70px_-24px_rgba(0,0,0,0.9)] backdrop-blur-2xl"
         onClick={(e) => e.stopPropagation()}
       >
         <button
           type="button"
           onClick={dismiss}
           aria-label="Close promotion"
-          className="absolute top-3.5 right-3.5 z-20 flex h-9 w-9 items-center justify-center bg-pitch/70 text-bone/80 transition-colors hover:bg-pitch hover:text-bone"
+          className="absolute top-2.5 right-2.5 z-20 flex h-8 w-8 items-center justify-center bg-pitch/55 text-bone/75 transition-colors hover:bg-pitch/80 hover:text-bone"
         >
-          <X className="h-4 w-4" />
+          <X className="h-3.5 w-3.5" />
         </button>
 
-        <div className="relative aspect-[4/5] w-full overflow-hidden bg-pitch">
+        <div className="relative aspect-[4/5] w-full overflow-hidden">
           <img
             src={slide.image}
             alt={slide.alt}
-            className="h-full w-full object-cover object-center opacity-85"
+            className="h-full w-full object-cover object-center opacity-50"
           />
-          <div className="absolute inset-0 bg-gradient-to-b from-pitch/80 via-pitch/20 to-pitch" />
+          <div className="absolute inset-0 bg-gradient-to-b from-pitch/50 via-pitch/5 to-pitch/75" />
 
-          <div className="absolute inset-0 flex flex-col items-center justify-between px-6 py-8 text-center">
-            <div className="pt-2">
-              <p className="promo-grunge text-2xl text-bone sm:text-3xl">{slide.titleTop}</p>
+          <div className="absolute inset-0 flex flex-col items-center justify-between px-4 py-6 text-center">
+            <div className="pt-1">
+              <p className="promo-grunge text-xl text-bone sm:text-2xl">{slide.titleTop}</p>
             </div>
 
             <div className="flex flex-col items-center">
-              <p className="promo-discount text-4xl text-crimson sm:text-5xl">{slide.discount}</p>
-              <p className="mt-2 font-sans text-xs font-medium tracking-[0.3em] text-bone uppercase">
+              <p className="promo-discount text-3xl text-crimson sm:text-4xl">{slide.discount}</p>
+              <p className="mt-1.5 font-sans text-[0.6rem] font-medium tracking-[0.28em] text-bone/85 uppercase">
                 {slide.subtitle}
               </p>
               <button
                 type="button"
                 onClick={handleShop}
-                className="mt-6 bg-bone px-9 py-3.5 font-sans text-[0.7rem] font-semibold tracking-[0.28em] text-pitch uppercase transition-colors hover:bg-crimson hover:text-bone"
+                className="mt-4 bg-bone px-7 py-2.5 font-sans text-[0.62rem] font-semibold tracking-[0.26em] text-pitch uppercase transition-colors hover:bg-crimson hover:text-bone"
               >
                 {slide.ctaLabel}
               </button>
               <button
                 type="button"
                 onClick={dismiss}
-                className="mt-3 font-sans text-[0.62rem] tracking-[0.22em] text-bone/55 uppercase transition-colors hover:text-bone"
+                className="mt-2.5 font-sans text-[0.55rem] tracking-[0.2em] text-bone/50 uppercase transition-colors hover:text-bone"
               >
                 Continue browsing
               </button>

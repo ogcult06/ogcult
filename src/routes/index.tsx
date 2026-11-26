@@ -160,7 +160,7 @@ function HomePage() {
         {/* Clickable promotional overlay */}
         <div
           onClick={scrollToDiscountedCollection}
-          className="relative z-10 flex h-full cursor-pointer flex-col items-center justify-between px-12 pt-24 pb-36 text-center md:px-20 md:pt-[6.25rem] md:pb-36"
+          className="relative z-10 flex h-full cursor-pointer flex-col items-center justify-between px-12 pt-[20svh] pb-36 text-center md:px-20"
         >
           {/* Top — Bold distressed/grunge white display title, clear of the model's head */}
           <header className="max-w-4xl">
