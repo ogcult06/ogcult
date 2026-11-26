@@ -342,7 +342,7 @@ function ProductPage() {
           </p>
 
           {p.description && (
-            <p className="mt-8 max-w-prose text-sm leading-relaxed text-muted-foreground">
+            <p className="mt-8 max-w-prose whitespace-pre-line text-sm leading-relaxed text-muted-foreground">
               {p.description}
             </p>
           )}
@@ -458,7 +458,7 @@ function ProductPage() {
             ].map((row) => (
               <div key={row.t} className="border-b border-border/60 py-5">
                 <dt className="label !text-foreground">{row.t}</dt>
-                <dd className="mt-3 text-xs leading-relaxed text-muted-foreground">{row.d}</dd>
+                <dd className="mt-3 whitespace-pre-line text-xs leading-relaxed text-muted-foreground">{row.d}</dd>
               </div>
             ))}
           </dl>

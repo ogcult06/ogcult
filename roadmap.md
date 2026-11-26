@@ -4,6 +4,7 @@
 - (nothing in progress)
 
 ## Done
+- Replaced OG HUSTLER's front and back photos and added the supplied full product description, keeping the model and details photos unchanged.
 - Widened all product image frames across cards, product pages, cart, search, checkout, confirmation, and tracking to square frames with full-image fit so every garment and its sleeves appear completely uncropped.
 - Moved OG HUSTLER HOODIE to the first spot in New Drop (and across the store catalogue).
 - Added OG HUSTLER HOODIE to Hoodies at ₹1,150 (MRP ₹4,500), with front, back, model, details photos and sizes S, M, L, XL; verified gallery and add-to-cart on phone and desktop.

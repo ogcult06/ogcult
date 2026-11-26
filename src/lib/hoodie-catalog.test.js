@@ -1,7 +1,7 @@
 import { describe, expect, test } from "bun:test";
 import { createClient } from "@supabase/supabase-js";
-import front from "@/assets/og-hustler-front.png.asset.json";
-import back from "@/assets/og-hustler-back.png.asset.json";
+import front from "@/assets/og-hustler-front-main.png.asset.json";
+import back from "@/assets/og-hustler-back-main.png.asset.json";
 import model from "@/assets/og-hustler-model.png.asset.json";
 import details from "@/assets/og-hustler-details.png.asset.json";
 
