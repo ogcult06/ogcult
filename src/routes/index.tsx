@@ -5,6 +5,7 @@ import { ChevronLeft, ChevronRight } from "lucide-react";
 import { ProductGrid } from "@/components/product-card";
 import { Newsletter } from "@/components/newsletter";
 import { PromoEntryPopup } from "@/components/promo-entry-popup";
+import { FloatingShopCta } from "@/components/floating-shop-cta";
 import { productsQueryOptions } from "@/lib/shopify";
 import { brand, home, imagery, promoHeroSlides, trustPoints } from "@/lib/site-content";
 import { Reveal } from "@/components/reveal";
@@ -127,6 +128,7 @@ function HomePage() {
   return (
     <>
       <PromoEntryPopup onShopNow={scrollToDiscountedCollection} />
+      <FloatingShopCta onShopNow={scrollToDiscountedCollection} />
 
       {/* ───────────────────────── HERO ───────────────────────── */}
       <section className="relative h-[100svh] min-h-[600px] w-full overflow-hidden bg-pitch text-bone">
