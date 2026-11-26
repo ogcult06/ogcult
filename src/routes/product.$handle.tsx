@@ -190,7 +190,7 @@ function ProductPage() {
     return (
       <div className="px-5 pt-28 pb-24 md:px-10 md:pt-36">
         <div className="grid gap-8 lg:grid-cols-2">
-          <div className="aspect-[4/5] w-full animate-pulse bg-card" />
+          <div className="aspect-square w-full animate-pulse bg-card" />
           <div className="space-y-4">
             <div className="h-10 w-2/3 animate-pulse bg-card" />
             <div className="h-4 w-1/4 animate-pulse bg-card" />
@@ -227,7 +227,7 @@ function ProductPage() {
               ref={galleryRef}
               onScroll={handleGalleryScroll}
               {...dragHandlers}
-              className="flex aspect-[4/5] w-full cursor-grab snap-x snap-mandatory overflow-x-auto overscroll-x-contain bg-card touch-pan-x active:cursor-grabbing [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
+              className="flex aspect-square w-full cursor-grab snap-x snap-mandatory overflow-x-auto overscroll-x-contain bg-card touch-pan-x active:cursor-grabbing [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
             >
               {images.map((img, i) => (
                 <div
@@ -323,7 +323,7 @@ function ProductPage() {
                     alt={img.node.altText ?? `${p.title} thumbnail ${i + 1}`}
                     loading="lazy"
                     draggable={false}
-                    className="aspect-[4/5] w-full bg-card object-contain"
+                    className="aspect-square w-full bg-card object-contain"
                   />
                 </button>
               ))}

@@ -105,7 +105,7 @@ function CartPage() {
                         src={image.url}
                         alt={image.altText ?? item.product.node.title}
                         loading="lazy"
-                        className="aspect-[4/5] w-full object-cover"
+                        className="aspect-square w-full object-contain"
                       />
                     )}
                   </Link>

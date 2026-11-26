@@ -382,7 +382,7 @@ function CheckoutPage() {
                       <img
                         src={image.url}
                         alt={image.altText ?? item.product.node.title}
-                        className="aspect-[4/5] w-full object-contain"
+                        className="aspect-square w-full object-contain"
                       />
                     )}
                   </div>

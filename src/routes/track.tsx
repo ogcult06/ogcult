@@ -136,7 +136,7 @@ function TrackPage() {
                     <img
                       src={item.image_url}
                       alt={item.product_title}
-                      className="aspect-[4/5] w-full object-contain"
+                      className="aspect-square w-full object-contain"
                     />
                   )}
                 </div>

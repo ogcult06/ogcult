@@ -80,7 +80,7 @@ export function SearchOverlay({ open, onClose }: { open: boolean; onClose: () =>
                           src={image.url}
                           alt={image.altText ?? p.node.title}
                           loading="lazy"
-                          className="aspect-[4/5] w-full object-cover"
+                          className="aspect-square w-full object-contain"
                         />
                       )}
                     </div>

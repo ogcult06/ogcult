@@ -172,7 +172,7 @@ export function CartDrawer() {
                           src={image.url}
                           alt={image.altText ?? item.product.node.title}
                           loading="lazy"
-                          className="aspect-[3/4] h-full w-full object-cover"
+                          className="aspect-square w-full object-contain"
                         />
                       )}
                     </Link>

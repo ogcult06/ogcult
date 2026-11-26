@@ -86,7 +86,7 @@ export function ProductCard({ product }: { product: ShopifyProduct }) {
             ref={cardGalleryRef}
             onScroll={handleCardScroll}
             {...dragHandlers}
-            className="flex aspect-[3/4] w-full cursor-grab snap-x snap-mandatory overflow-x-auto overscroll-x-contain touch-pan-x active:cursor-grabbing no-scrollbar"
+            className="flex aspect-square w-full cursor-grab snap-x snap-mandatory overflow-x-auto overscroll-x-contain touch-pan-x active:cursor-grabbing no-scrollbar"
           >
             {primary ? (
               images.map((img, i) => (
@@ -100,7 +100,7 @@ export function ProductCard({ product }: { product: ShopifyProduct }) {
                     loading={i === 0 ? "eager" : "lazy"}
                     decoding="async"
                     draggable={false}
-                    className="h-full w-full object-cover transition-transform duration-[1200ms] ease-[cubic-bezier(0.16,1,0.3,1)] group-hover:scale-[1.03]"
+                    className="h-full w-full object-contain transition-transform duration-[1200ms] ease-[cubic-bezier(0.16,1,0.3,1)] group-hover:scale-[1.03]"
                   />
                 </div>
               ))
@@ -222,7 +222,7 @@ export function ProductGrid({
       <div className={grid}>
         {Array.from({ length: 4 }).map((_, i) => (
           <div key={i}>
-            <div className="aspect-[3/4] w-full animate-pulse bg-muted/60" />
+            <div className="aspect-square w-full animate-pulse bg-muted/60" />
             <div className="mx-auto mt-3 h-3 w-24 animate-pulse bg-muted/60" />
             <div className="mx-auto mt-2 h-3 w-16 animate-pulse bg-muted/40" />
           </div>
@@ -236,7 +236,7 @@ export function ProductGrid({
       <div className={grid}>
         {Array.from({ length: 4 }).map((_, i) => (
           <div key={i}>
-            <div className="relative aspect-[3/4] w-full overflow-hidden bg-muted/40">
+            <div className="relative aspect-square w-full overflow-hidden bg-muted/40">
               <span className="label absolute bottom-4 left-4">
                 {String(i + 1).padStart(2, "0")}
               </span>
