@@ -1,14 +1,15 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { useEffect, useMemo, useRef, useState } from "react";
+import { ChevronRight } from "lucide-react";
 import { ProductGrid } from "@/components/product-card";
 import { Newsletter } from "@/components/newsletter";
 import { productsQueryOptions } from "@/lib/shopify";
 import { brand, home, imagery, trustPoints } from "@/lib/site-content";
 import { Reveal } from "@/components/reveal";
-import look1 from "@/assets/p-hoodie.jpg";
-import look2 from "@/assets/p-tee.jpg";
-import look3 from "@/assets/p-cargo.jpg";
+import catHoodies from "@/assets/cat-hoodies.png";
+import catTshirts from "@/assets/p-the-og-tees.jpg";
+import catJoggers from "@/assets/cat-joggers.png";
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -24,6 +25,8 @@ export const Route = createFileRoute("/")({
         property: "og:description",
         content: "Premium underground streetwear in limited runs. Shop Vol. 01 Nightshift.",
       },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary_large_image" },
       { property: "og:url", content: "/" },
     ],
     links: [{ rel: "canonical", href: "/" }],
@@ -83,11 +86,26 @@ const sortLabels: { key: SortKey; label: string }[] = [
   { key: "price-desc", label: "Price: high to low" },
 ];
 
-const lookbook = [
-  { label: "Hoodies", image: look1, search: { filter: "Hoodies" } },
-  { label: "Oversized Tees", image: look2, search: { filter: "T-Shirts" } },
-  { label: "Sweatpants", image: look3, search: { filter: "Sweatpants" } },
-] as const;
+const categoryTiles = {
+  hoodies: {
+    label: "Hoodies",
+    image: catHoodies,
+    alt: "OG CULT oversized heavyweight hoodies",
+    search: { filter: "Hoodies" },
+  },
+  tshirts: {
+    label: "T-Shirts",
+    image: catTshirts,
+    alt: "OG CULT oversized heavyweight t-shirts",
+    search: { filter: "T-Shirts" },
+  },
+  joggers: {
+    label: "Joggers",
+    image: catJoggers,
+    alt: "OG CULT heavyweight relaxed joggers",
+    search: { filter: "Joggers" },
+  },
+} as const;
 
 function HomePage() {
   const { data, isLoading } = useQuery(productsQueryOptions());
@@ -206,6 +224,83 @@ function HomePage() {
         </div>
       </section>
 
+      {/* ─────────────────── CATEGORY BENTO SECTION ─────────────────── */}
+      <section aria-label="Shop by category" className="w-full bg-foreground">
+        <div className="grid w-full grid-cols-2 grid-rows-2 gap-0 md:h-[min(86svh,840px)] md:min-h-[540px]">
+          {/* Left Top — Hoodies */}
+          <Link
+            to="/shop"
+            search={categoryTiles.hoodies.search}
+            className="group relative aspect-[5/6] overflow-hidden bg-foreground md:aspect-auto md:h-full"
+          >
+            <img
+              src={categoryTiles.hoodies.image}
+              alt={categoryTiles.hoodies.alt}
+              loading="eager"
+              className="absolute inset-0 h-full w-full object-cover object-[50%_20%] transition-transform duration-[1200ms] ease-[cubic-bezier(0.16,1,0.3,1)] group-hover:scale-105"
+            />
+            <div className="absolute inset-x-0 bottom-0 h-1/2 bg-gradient-to-t from-foreground/80 via-foreground/25 to-transparent" />
+            <div className="absolute bottom-4 left-4 flex items-center gap-1.5 text-bone md:bottom-7 md:left-7 md:gap-2">
+              <span className="font-sans text-[1.65rem] font-semibold leading-none tracking-[-0.02em] sm:text-3xl md:text-4xl">
+                {categoryTiles.hoodies.label}
+              </span>
+              <ChevronRight
+                aria-hidden
+                className="h-5 w-5 shrink-0 stroke-[2.2] transition-transform duration-300 group-hover:translate-x-1 md:h-7 md:w-7"
+              />
+            </div>
+          </Link>
+
+          {/* Right Tall — Joggers */}
+          <Link
+            to="/shop"
+            search={categoryTiles.joggers.search}
+            className="group relative col-start-2 row-span-2 row-start-1 overflow-hidden bg-foreground"
+          >
+            <img
+              src={categoryTiles.joggers.image}
+              alt={categoryTiles.joggers.alt}
+              loading="eager"
+              className="absolute inset-0 h-full w-full object-cover object-[50%_58%] transition-transform duration-[1200ms] ease-[cubic-bezier(0.16,1,0.3,1)] group-hover:scale-105"
+            />
+            <div className="absolute inset-x-0 bottom-0 h-1/3 bg-gradient-to-t from-foreground/80 via-foreground/25 to-transparent" />
+            <div className="absolute bottom-4 left-4 flex items-center gap-1.5 text-bone md:bottom-7 md:left-7 md:gap-2">
+              <span className="font-sans text-[1.65rem] font-semibold leading-none tracking-[-0.02em] sm:text-3xl md:text-4xl">
+                {categoryTiles.joggers.label}
+              </span>
+              <ChevronRight
+                aria-hidden
+                className="h-5 w-5 shrink-0 stroke-[2.2] transition-transform duration-300 group-hover:translate-x-1 md:h-7 md:w-7"
+              />
+            </div>
+          </Link>
+
+          {/* Left Bottom — T-Shirts */}
+          <Link
+            to="/shop"
+            search={categoryTiles.tshirts.search}
+            className="group relative aspect-[5/6] overflow-hidden bg-foreground md:aspect-auto md:h-full"
+          >
+            <img
+              src={categoryTiles.tshirts.image}
+              alt={categoryTiles.tshirts.alt}
+              loading="eager"
+              className="absolute inset-0 h-full w-full object-cover object-[50%_28%] transition-transform duration-[1200ms] ease-[cubic-bezier(0.16,1,0.3,1)] group-hover:scale-105"
+            />
+            <div className="absolute inset-x-0 bottom-0 h-1/2 bg-gradient-to-t from-foreground/80 via-foreground/25 to-transparent" />
+            <div className="absolute bottom-4 left-4 flex items-center gap-1.5 text-bone md:bottom-7 md:left-7 md:gap-2">
+              <span className="font-sans text-[1.65rem] font-semibold leading-none tracking-[-0.02em] sm:text-3xl md:text-4xl">
+                {categoryTiles.tshirts.label}
+              </span>
+              <ChevronRight
+                aria-hidden
+                className="h-5 w-5 shrink-0 stroke-[2.2] transition-transform duration-300 group-hover:translate-x-1 md:h-7 md:w-7"
+              />
+            </div>
+          </Link>
+        </div>
+      </section>
+
       {/* ───────────────────── PRODUCT SHOWCASE ───────────────────── */}
       <section className="bg-background px-5 pt-16 pb-20 md:px-10 md:pt-24 md:pb-28">
         <Reveal className="flex flex-wrap items-end justify-between gap-4">
@@ -281,34 +376,6 @@ function HomePage() {
         {/* Grid */}
         <div className="mt-10">
           <ProductGrid products={products} isLoading={isLoading} emptyState="placeholder" />
-        </div>
-      </section>
-
-      {/* ─────────────────── CATEGORY LOOKBOOK STRIP ─────────────────── */}
-      <section className="bg-background pb-20 md:pb-28">
-        <div className="flex gap-1 overflow-x-auto px-5 no-scrollbar md:px-10">
-          {lookbook.map((cat) => (
-            <Link
-              key={cat.label}
-              to="/shop"
-              search={cat.search}
-              className="group relative aspect-[3/4] h-[68vh] min-h-[420px] max-h-[640px] w-[78vw] shrink-0 overflow-hidden bg-muted sm:w-[46vw] md:w-[23vw] lg:w-[23.5vw]"
-            >
-              <img
-                src={cat.image}
-                alt={cat.label}
-                loading="lazy"
-                className="h-full w-full object-cover transition-transform duration-[1200ms] ease-[cubic-bezier(0.16,1,0.3,1)] group-hover:scale-105"
-              />
-              <div className="absolute inset-0 bg-gradient-to-t from-foreground/70 via-foreground/10 to-transparent" />
-              <div className="absolute bottom-6 left-5 flex items-center gap-2 text-bone md:bottom-7 md:left-6">
-                <span className="font-display text-2xl uppercase leading-none md:text-3xl">
-                  {cat.label}
-                </span>
-                <span aria-hidden className="text-xl md:text-2xl">›</span>
-              </div>
-            </Link>
-          ))}
         </div>
       </section>
 
