@@ -1,11 +1,12 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { useEffect, useMemo, useRef, useState } from "react";
-import { ChevronRight } from "lucide-react";
+import { ChevronLeft, ChevronRight } from "lucide-react";
 import { ProductGrid } from "@/components/product-card";
 import { Newsletter } from "@/components/newsletter";
+import { PromoEntryPopup } from "@/components/promo-entry-popup";
 import { productsQueryOptions } from "@/lib/shopify";
-import { brand, home, imagery, trustPoints } from "@/lib/site-content";
+import { brand, home, imagery, promoHeroSlides, trustPoints } from "@/lib/site-content";
 import { Reveal } from "@/components/reveal";
 import catHoodies from "@/assets/cat-hoodies.png";
 import catTshirts from "@/assets/p-the-og-tees.jpg";
@@ -18,12 +19,12 @@ export const Route = createFileRoute("/")({
       {
         name: "description",
         content:
-          "OG CULT is premium underground streetwear cut in limited runs. Built for the ones who don't follow. Vol. 01 Nightshift is live.",
+          "OG CULT is premium underground streetwear cut in limited runs. Built for the ones who don't follow. Shop the Black Friday drop.",
       },
       { property: "og:title", content: "OG CULT — Underground Luxury Streetwear" },
       {
         property: "og:description",
-        content: "Premium underground streetwear in limited runs. Shop Vol. 01 Nightshift.",
+        content: "Premium underground streetwear in limited runs. Shop the latest OG CULT drop.",
       },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
@@ -60,23 +61,6 @@ function useParallax(strength = 0.18) {
 
   return { ref, offset };
 }
-
-const heroSlides = [
-  {
-    image: imagery.hero,
-    alt: "OG CULT campaign — figure in an underground car park at night",
-    kicker: "Vol. 01 — Nightshift",
-    headline: "Wear / Become OG",
-    sub: "Black Label Drop",
-  },
-  {
-    image: imagery.editorial,
-    alt: "OG CULT editorial campaign — figures on a rain-soaked street at night",
-    kicker: "Limited Run",
-    headline: "Not Made For Everyone",
-    sub: "Underground Luxury",
-  },
-];
 
 type SortKey = "best" | "price-asc" | "price-desc";
 
@@ -115,9 +99,14 @@ function HomePage() {
   const [sort, setSort] = useState<SortKey>("best");
   const [sortOpen, setSortOpen] = useState(false);
 
-  const currentSlide = heroSlides[slide] ?? heroSlides[0]!;
-  const nextSlide = () => setSlide((s) => (s + 1) % heroSlides.length);
-  const prevSlide = () => setSlide((s) => (s - 1 + heroSlides.length) % heroSlides.length);
+  const currentSlide = promoHeroSlides[slide] ?? promoHeroSlides[0];
+  const nextSlide = () => setSlide((s) => (s + 1) % promoHeroSlides.length);
+  const prevSlide = () => setSlide((s) => (s - 1 + promoHeroSlides.length) % promoHeroSlides.length);
+
+  const scrollToDiscountedCollection = () => {
+    setOnSaleOnly(true);
+    document.getElementById("discounted-collection")?.scrollIntoView({ behavior: "smooth" });
+  };
 
   const editorial = useParallax(0.2);
 
@@ -137,87 +126,108 @@ function HomePage() {
 
   return (
     <>
+      <PromoEntryPopup onShopNow={scrollToDiscountedCollection} />
+
       {/* ───────────────────────── HERO ───────────────────────── */}
-      <section className="relative h-[100svh] min-h-[560px] w-full overflow-hidden bg-foreground">
-        {/* Slides */}
-        <div className="absolute inset-0">
-          {heroSlides.map((s, i) => (
+      <section className="relative h-[100svh] min-h-[600px] w-full overflow-hidden bg-pitch text-bone">
+        {/* Centered model/product hero slides on pitch-black backdrop */}
+        <div className="absolute inset-0 flex items-center justify-center bg-pitch">
+          {promoHeroSlides.map((s, i) => (
             <div
               key={s.image}
-              className={`absolute inset-0 transition-opacity duration-1000 ease-[cubic-bezier(0.16,1,0.3,1)] ${
-                i === slide ? "opacity-100" : "opacity-0"
+              className={`absolute inset-0 flex items-center justify-center transition-opacity duration-700 ease-[cubic-bezier(0.16,1,0.3,1)] ${
+                i === slide ? "opacity-100" : "pointer-events-none opacity-0"
               }`}
             >
               <img
                 src={s.image}
                 alt={s.alt}
-                className="h-full w-full object-cover object-center"
+                className="h-full w-full max-w-4xl object-cover object-center"
               />
-              <div className="absolute inset-0 bg-foreground/25" />
-              <div className="absolute inset-x-0 bottom-0 h-[70%] bg-gradient-to-t from-foreground via-foreground/60 to-transparent" />
+              {/* Seamless pitch-black edge fade + top/bottom contrast scrims */}
+              <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,transparent_32%,var(--color-pitch)_92%)]" />
+              <div className="absolute inset-x-0 top-0 h-[40%] bg-gradient-to-b from-pitch/90 via-pitch/35 to-transparent" />
+              <div className="absolute inset-x-0 bottom-0 h-[48%] bg-gradient-to-t from-pitch via-pitch/65 to-transparent" />
             </div>
           ))}
         </div>
 
-        {/* Asymmetric headline — bottom-left */}
-        <div className="relative z-10 flex h-full flex-col justify-end px-5 pb-16 md:px-10 md:pb-24">
-          <div className="max-w-4xl">
-            <p className="label !text-bone/80">{currentSlide.kicker}</p>
-            <h1 className="display-hero mt-5 flex items-center gap-4 text-bone md:gap-6">
-              <span className="flex flex-col items-end text-right leading-[0.95] text-[0.62em]">
-                <span>OG CULT</span>
+        {/* Clickable promotional overlay */}
+        <div
+          onClick={scrollToDiscountedCollection}
+          className="relative z-10 flex h-full cursor-pointer flex-col items-center justify-between px-12 pt-24 pb-16 text-center md:px-20 md:pt-28 md:pb-20"
+        >
+          {/* Top — Bold distressed/grunge white display title */}
+          <header className="max-w-4xl">
+            <h1 className="promo-grunge text-bone">
+              <span className="block text-[clamp(2rem,6vw,4.5rem)] tracking-[0.06em]">
+                {currentSlide.titleTop}
               </span>
-              <span aria-hidden className="h-[1.15em] w-[3px] shrink-0 bg-bone/70 md:w-[4px]" />
-              <span>{currentSlide.headline}</span>
+              <span className="mt-1 block text-[clamp(2.9rem,9.5vw,7.25rem)]">
+                {currentSlide.titleMain}
+              </span>
             </h1>
-            <p className="mt-4 font-display text-2xl uppercase tracking-tight text-bone/80 md:text-3xl">
-              {currentSlide.sub}
+          </header>
+
+          {/* Bottom — Slanted vibrant crimson 70% OFF + Flat Discount + Shop Now */}
+          <div className="flex flex-col items-center">
+            <p className="promo-discount text-[clamp(3.75rem,13vw,9.5rem)] text-crimson">
+              {currentSlide.discount}
             </p>
+            <p className="mt-2 font-sans text-xs font-medium tracking-[0.34em] text-bone uppercase sm:text-sm md:text-base">
+              {currentSlide.subtitle}
+            </p>
+            <button
+              type="button"
+              onClick={(e) => {
+                e.stopPropagation();
+                scrollToDiscountedCollection();
+              }}
+              className="mt-6 border border-bone/80 bg-pitch/55 px-9 py-3.5 font-sans text-[0.7rem] font-semibold tracking-[0.3em] text-bone uppercase backdrop-blur-sm transition-all duration-300 hover:border-crimson hover:bg-crimson hover:text-bone md:mt-7"
+            >
+              {currentSlide.ctaLabel}
+            </button>
           </div>
         </div>
 
-        {/* Accent callout — bottom-right, links to /shop */}
-        <Link
-          to="/shop"
-          className="absolute bottom-16 right-5 z-10 flex flex-col items-end text-right text-bone md:bottom-24 md:right-10"
-        >
-          <span className="label !text-bone/70">New Drop</span>
-          <span className="mt-2 flex items-center gap-3 font-display text-3xl uppercase leading-none md:text-5xl">
-            Shop Now
-            <span aria-hidden className="text-bone/70">•</span>
-          </span>
-          <span className="mt-3 h-px w-16 bg-bone md:w-24" />
-        </Link>
-
-        {/* Carousel arrows */}
+        {/* Subtle left / right carousel arrows */}
         <button
           type="button"
-          onClick={prevSlide}
+          onClick={(e) => {
+            e.stopPropagation();
+            prevSlide();
+          }}
           aria-label="Previous slide"
-          className="absolute top-1/2 left-5 z-10 flex h-11 w-11 -translate-y-1/2 items-center justify-center border border-bone/30 bg-foreground/30 text-bone backdrop-blur transition-all duration-300 hover:border-bone hover:bg-foreground/50 md:left-10"
+          className="absolute top-1/2 left-3 z-20 flex h-11 w-11 -translate-y-1/2 items-center justify-center text-bone/60 transition-colors hover:text-bone md:left-7"
         >
-          ‹
+          <ChevronLeft className="h-7 w-7 stroke-[1.5]" />
         </button>
         <button
           type="button"
-          onClick={nextSlide}
+          onClick={(e) => {
+            e.stopPropagation();
+            nextSlide();
+          }}
           aria-label="Next slide"
-          className="absolute top-1/2 right-5 z-10 flex h-11 w-11 -translate-y-1/2 items-center justify-center border border-bone/30 bg-foreground/30 text-bone backdrop-blur transition-all duration-300 hover:border-bone hover:bg-foreground/50 md:right-10"
+          className="absolute top-1/2 right-3 z-20 flex h-11 w-11 -translate-y-1/2 items-center justify-center text-bone/60 transition-colors hover:text-bone md:right-7"
         >
-          ›
+          <ChevronRight className="h-7 w-7 stroke-[1.5]" />
         </button>
 
-        {/* Slide indicators */}
-        <div className="absolute bottom-16 left-5 z-10 flex gap-2 md:bottom-24 md:left-10">
-          {heroSlides.map((_, i) => (
+        {/* Centered pagination dots at bottom */}
+        <div className="absolute inset-x-0 bottom-6 z-20 flex items-center justify-center gap-2.5">
+          {promoHeroSlides.map((_, i) => (
             <button
               key={i}
               type="button"
-              onClick={() => setSlide(i)}
+              onClick={(e) => {
+                e.stopPropagation();
+                setSlide(i);
+              }}
               aria-label={`Go to slide ${i + 1}`}
               aria-current={i === slide}
-              className={`h-1 transition-all duration-300 ${
-                i === slide ? "w-6 bg-bone" : "w-2 bg-bone/30"
+              className={`h-2 rounded-full transition-all duration-300 ${
+                i === slide ? "w-6 bg-bone" : "w-2 bg-bone/35 hover:bg-bone/65"
               }`}
             />
           ))}
@@ -302,7 +312,10 @@ function HomePage() {
       </section>
 
       {/* ───────────────────── PRODUCT SHOWCASE ───────────────────── */}
-      <section className="bg-background px-5 pt-16 pb-20 md:px-10 md:pt-24 md:pb-28">
+      <section
+        id="discounted-collection"
+        className="scroll-mt-20 bg-background px-5 pt-16 pb-20 md:px-10 md:pt-24 md:pb-28"
+      >
         <Reveal className="flex flex-wrap items-end justify-between gap-4">
           <div>
             <span className="block h-px w-10 bg-border" />

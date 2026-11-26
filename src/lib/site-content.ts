@@ -32,13 +32,35 @@ export const imagery = {
 };
 
 export const home = {
-  heroHeadline: "Wear Become OG",
-  heroSub: "Vol. 01 — Nightshift",
+  heroHeadline: "Grand Theft Black Friday",
+  heroSub: "Flat Discount",
   dropTitle: "New drop",
   dropSub: "The latest from OG CULT.",
   editorialHeadline: "Not made for everyone.",
   marquee: ["Limited runs", "No restocks", "Cut in small batches", "Worldwide shipping"],
 };
+
+/** Customizable promotional hero slides shown on the homepage front banner. */
+export const promoHeroSlides = [
+  {
+    image: heroImage,
+    alt: "OG CULT streetwear promotional campaign model",
+    titleTop: "GRAND THEFT",
+    titleMain: "BLACK FRIDAY",
+    discount: "70% OFF",
+    subtitle: "Flat Discount",
+    ctaLabel: "Shop Now",
+  },
+  {
+    image: editorialImage,
+    alt: "OG CULT midnight collection streetwear campaign",
+    titleTop: "MIDNIGHT ARCHIVE",
+    titleMain: "BLACK FRIDAY",
+    discount: "70% OFF",
+    subtitle: "Flat Discount",
+    ctaLabel: "Shop Now",
+  },
+] as const;
 
 export const trustPoints = [
   { title: "Secure checkout", body: "Payments processed by Shopify." },

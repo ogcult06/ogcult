@@ -24,6 +24,7 @@
   --radius-4xl: 0px;
   --font-display: "Anton", "Arial Narrow", sans-serif;
   --font-logo: "Anton", "Arial Narrow", sans-serif;
+  --font-grunge: "Rubik Distressed", "Anton", sans-serif;
   --font-sans: "Space Grotesk", system-ui, sans-serif;
   --color-background: var(--background);
   --color-foreground: var(--foreground);
@@ -46,6 +47,8 @@
   --color-ring: var(--ring);
   --color-blood: var(--blood);
   --color-bone: var(--bone);
+  --color-pitch: var(--pitch);
+  --color-crimson: var(--crimson);
 }
 
 :root {
@@ -71,6 +74,8 @@
   --ring: oklch(0.4 0 0);
   --blood: oklch(0.46 0.19 26);
   --bone: oklch(0.96 0 0);
+  --pitch: oklch(0.145 0 0);
+  --crimson: oklch(0.55 0.24 26);
   --success: oklch(0.6 0.14 145);
   --success-foreground: oklch(0.98 0 0);
   --warning: oklch(0.75 0.16 70);
@@ -299,6 +304,25 @@
     opacity: 0.35;
     text-decoration: line-through;
   }
+}
+
+/* Distressed grunge promotional display headline */
+@utility promo-grunge {
+  font-family: var(--font-grunge);
+  text-transform: uppercase;
+  line-height: 0.92;
+  letter-spacing: 0.03em;
+  text-shadow: 0 6px 28px color-mix(in oklab, var(--color-pitch) 85%, transparent);
+}
+
+/* Slanted vibrant crimson promotional discount callout */
+@utility promo-discount {
+  font-family: var(--font-display);
+  text-transform: uppercase;
+  line-height: 0.85;
+  letter-spacing: -0.02em;
+  transform: skewX(-12deg) rotate(-2deg);
+  text-shadow: 0 10px 34px color-mix(in oklab, var(--color-pitch) 90%, transparent);
 }
 
 /* Discount badge — green high contrast */
