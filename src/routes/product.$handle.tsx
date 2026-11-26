@@ -4,7 +4,7 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { Loader2, Minus, Plus } from "lucide-react";
 import { toast } from "sonner";
 import { useCartStore } from "@/stores/cartStore";
-import { formatMoney, isTShirtProduct, productQueryOptions, sortSizes } from "@/lib/shopify";
+import { discountInfo, formatMoney, isTShirtProduct, productQueryOptions, sortSizes } from "@/lib/shopify";
 import { useDragScroll } from "@/hooks/use-drag-scroll";
 
 const SITE_URL = "https://ogcult.store";
@@ -35,7 +35,7 @@ export const Route = createFileRoute("/product/$handle")({
       { property: "og:url", content: url },
       { name: "twitter:card", content: "summary_large_image" },
     ];
-    if (image) {
+    if (image?.startsWith("https://")) {
       meta.push({ property: "og:image", content: image });
       meta.push({ name: "twitter:image", content: image });
     }
@@ -214,6 +214,7 @@ function ProductPage() {
 
   const price = selectedVariant?.price ?? p.priceRange.minVariantPrice;
   const soldOut = !p.availableForSale;
+  const comparePrice = discountInfo(p)?.compare ?? (isTShirtProduct(p) ? 1999 : null);
 
   return (
     <div className="pt-20 pb-28 md:pt-28">
@@ -334,8 +335,8 @@ function ProductPage() {
         <div className="px-5 pt-10 md:px-10 lg:pt-4">
           <h1 className="font-display text-4xl uppercase md:text-6xl">{p.title}</h1>
           <p className="mt-4 flex items-baseline gap-3 text-sm text-muted-foreground">
-            {isTShirtProduct(p) && (
-              <span className="opacity-55 line-through">{formatMoney(1999, price.currencyCode)}</span>
+            {comparePrice !== null && (
+              <span className="opacity-55 line-through">{formatMoney(comparePrice, price.currencyCode)}</span>
             )}
             <span>{formatMoney(price.amount, price.currencyCode)}</span>
           </p>
@@ -469,9 +470,9 @@ function ProductPage() {
         <div className="flex flex-col justify-center pr-2">
           <span className="label">{size ?? (requiresSize ? "Pick size" : "One size")}</span>
           <span className="flex items-baseline gap-2 text-xs">
-            {isTShirtProduct(p) && (
+            {comparePrice !== null && (
               <span className="text-muted-foreground line-through">
-                {formatMoney(1999, price.currencyCode)}
+                {formatMoney(comparePrice, price.currencyCode)}
               </span>
             )}
             <span>{formatMoney(price.amount, price.currencyCode)}</span>

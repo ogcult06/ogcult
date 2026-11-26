@@ -4,6 +4,7 @@
 - (nothing in progress)
 
 ## Done
+- Added OG HUSTLER HOODIE to Hoodies at ₹1,150 (MRP ₹4,500), with front, back, model, details photos and sizes S, M, L, XL; verified gallery and add-to-cart on phone and desktop.
 - Replaced the sale headline with OG CULT in Old London lettering and reduced the floating Shop Now pill to a clear, blurred-glass button.
 - Reference-style floating Shop Now pill visible from the homepage banner; smaller discount text and Black Friday line removed.
 - Floating liquid-glass bottom CTA bar ("Shop Now") on the homepage, 16px above the bottom edge.
