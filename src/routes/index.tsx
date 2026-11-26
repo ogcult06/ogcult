@@ -130,19 +130,22 @@ function HomePage() {
 
       {/* ───────────────────────── HERO ───────────────────────── */}
       <section className="relative h-[100svh] min-h-[600px] w-full overflow-hidden bg-pitch text-bone">
-        {/* Centered model/product hero slides on pitch-black backdrop */}
-        <div className="absolute inset-0 flex items-center justify-center bg-pitch">
+        {/* Centered model/product hero slides on pitch-black backdrop.
+            The frame is anchored to the top and runs past the bottom edge, so the
+            model's head sits low enough for the sale title to clear it, and a slice
+            of the lower body is cropped off. */}
+        <div className="absolute inset-x-0 top-[13%] -bottom-[16%] flex items-start justify-center bg-pitch">
           {promoHeroSlides.map((s, i) => (
             <div
               key={s.image}
-              className={`absolute inset-0 flex items-center justify-center transition-opacity duration-700 ease-[cubic-bezier(0.16,1,0.3,1)] ${
+              className={`absolute inset-0 flex items-start justify-center transition-opacity duration-700 ease-[cubic-bezier(0.16,1,0.3,1)] ${
                 i === slide ? "opacity-100" : "pointer-events-none opacity-0"
               }`}
             >
               <img
                 src={s.image}
                 alt={s.alt}
-                className="h-full w-full max-w-4xl object-cover object-center"
+                className="h-full w-full max-w-4xl object-cover object-top"
               />
               {/* Seamless pitch-black edge fade + top/bottom contrast scrims */}
               <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,transparent_32%,var(--color-pitch)_92%)]" />
@@ -155,15 +158,15 @@ function HomePage() {
         {/* Clickable promotional overlay */}
         <div
           onClick={scrollToDiscountedCollection}
-          className="relative z-10 flex h-full cursor-pointer flex-col items-center justify-between px-12 pt-24 pb-16 text-center md:px-20 md:pt-28 md:pb-20"
+          className="relative z-10 flex h-full cursor-pointer flex-col items-center justify-between px-12 pt-24 pb-16 text-center md:px-20 md:pt-[6.25rem] md:pb-20"
         >
-          {/* Top — Bold distressed/grunge white display title */}
+          {/* Top — Bold distressed/grunge white display title, clear of the model's head */}
           <header className="max-w-4xl">
             <h1 className="promo-grunge text-bone">
-              <span className="block text-[clamp(2rem,6vw,4.5rem)] tracking-[0.06em]">
+              <span className="block text-[clamp(1.8rem,4.8vw,3.5rem)] tracking-[0.06em]">
                 {currentSlide.titleTop}
               </span>
-              <span className="mt-1 block text-[clamp(2.9rem,9.5vw,7.25rem)]">
+              <span className="mt-1 block text-[clamp(2.6rem,7.8vw,5.8rem)]">
                 {currentSlide.titleMain}
               </span>
             </h1>
