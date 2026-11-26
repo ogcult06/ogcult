@@ -4,6 +4,7 @@
 - (nothing in progress)
 
 ## Done
+- Replaced the sale headline with OG CULT in Old London lettering and reduced the floating Shop Now pill to a clear, blurred-glass button.
 - Reference-style floating Shop Now pill visible from the homepage banner; smaller discount text and Black Friday line removed.
 - Floating liquid-glass bottom CTA bar ("Shop Now") on the homepage, 16px above the bottom edge.
 - Hero sale title moved above the model's head; bottom of the hero photo cropped.

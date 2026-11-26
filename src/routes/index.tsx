@@ -162,10 +162,10 @@ function HomePage() {
           onClick={scrollToDiscountedCollection}
           className="relative z-10 flex h-full cursor-pointer flex-col items-center justify-between px-12 pt-[20svh] pb-36 text-center md:px-20"
         >
-          {/* Top — Bold distressed/grunge white display title, clear of the model's head */}
+          {/* Old London brand lettering above the model's head */}
           <header className="max-w-4xl">
-            <h1 className="promo-grunge text-bone">
-              <span className="block text-[clamp(1.8rem,4.8vw,3.5rem)] tracking-[0.06em]">
+            <h1 className="promo-brand text-bone">
+              <span className="block text-4xl tracking-normal sm:text-5xl md:text-6xl">
                 {currentSlide.titleTop}
               </span>
             </h1>

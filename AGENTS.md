@@ -10,3 +10,4 @@
 <!-- LOVABLE:END -->
 
 - Keep homepage floating shopping actions in the shared FloatingShopCta component and style its glass surface with global semantic tokens so the banner and scrolling states stay consistent.
+- Serve the promotional display font from public/fonts and apply it through a global font token so banner lettering does not depend on an external font host.

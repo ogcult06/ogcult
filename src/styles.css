@@ -2,6 +2,14 @@
 @source "../src";
 @import "tw-animate-css";
 
+@font-face {
+  font-family: "Old London";
+  src: url("/fonts/old-london.woff") format("woff");
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+}
+
 @custom-variant dark (&:is(.dark *));
 
 /*
@@ -25,6 +33,7 @@
   --font-display: "Anton", "Arial Narrow", sans-serif;
   --font-logo: "Anton", "Arial Narrow", sans-serif;
   --font-grunge: "Rubik Distressed", "Anton", sans-serif;
+  --font-promo-brand: "Old London", serif;
   --font-sans: "Space Grotesk", system-ui, sans-serif;
   --color-background: var(--background);
   --color-foreground: var(--foreground);
@@ -77,10 +86,10 @@
   --bone: oklch(0.96 0 0);
   --pitch: oklch(0.145 0 0);
   --crimson: oklch(0.55 0.24 26);
-  --glass-surface: oklch(1 0 0 / 0.78);
-  --glass-border: oklch(1 0 0 / 0.5);
-  --glass-foreground: oklch(0.18 0 0);
-  --glass-highlight: oklch(1 0 0 / 0.6);
+  --glass-surface: oklch(1 0 0 / 0.12);
+  --glass-border: oklch(1 0 0 / 0.28);
+  --glass-foreground: oklch(0.98 0 0);
+  --glass-highlight: oklch(1 0 0 / 0.3);
   --glass-shadow: oklch(0 0 0 / 0.28);
   --success: oklch(0.6 0.14 145);
   --success-foreground: oklch(0.98 0 0);
@@ -317,6 +326,7 @@
   background: var(--glass-surface);
   border-color: var(--glass-border);
   box-shadow: inset 0 1px 0 var(--glass-highlight), 0 8px 28px var(--glass-shadow);
+  text-shadow: 0 1px 3px var(--color-pitch), 0 0 6px var(--color-pitch);
 }
 
 .floating-shop-pill:hover {
@@ -324,11 +334,12 @@
   color: var(--glass-foreground);
 }
 
-@utility promo-grunge {
-  font-family: var(--font-grunge);
+@utility promo-brand {
+  font-family: var(--font-promo-brand);
+  font-weight: 400;
   text-transform: uppercase;
-  line-height: 0.92;
-  letter-spacing: 0.03em;
+  line-height: 1;
+  letter-spacing: 0;
   text-shadow: 0 6px 28px color-mix(in oklab, var(--color-pitch) 85%, transparent);
 }
 

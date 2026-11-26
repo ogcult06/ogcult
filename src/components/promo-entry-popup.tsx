@@ -75,7 +75,7 @@ export function PromoEntryPopup({ onShopNow }: { onShopNow: () => void }) {
 
           <div className="absolute inset-0 flex flex-col items-center justify-between px-4 py-6 text-center">
             <div className="pt-1">
-              <p className="promo-grunge text-xl text-bone sm:text-2xl">{slide.titleTop}</p>
+              <p className="promo-brand text-xl text-bone sm:text-2xl">{slide.titleTop}</p>
             </div>
 
             <div className="flex flex-col items-center">
