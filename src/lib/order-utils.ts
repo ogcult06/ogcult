@@ -141,3 +141,12 @@ export function formatOrderAddress(order: {
     .filter(Boolean)
     .join("\n");
 }
+
+const CSV_FORMULA_PREFIX = /^[\t\r]|^\s*[=+\-@]/;
+
+/** Neutralizes spreadsheet formula prefixes (=, +, -, @, tab, CR) and quotes a CSV cell. */
+export function escapeCsvCell(value: unknown): string {
+  const str = String(value ?? "");
+  const safe = CSV_FORMULA_PREFIX.test(str) ? `'${str}` : str;
+  return `"${safe.replace(/"/g, '""')}"`;
+}

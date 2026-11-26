@@ -201,7 +201,7 @@ function CheckoutPage() {
             },
           });
           if (verified.ok) {
-            goToConfirmation(verified.orderNumber, verified.token);
+            goToConfirmation(verified.orderNumber, result.token);
           } else {
             toast.error(verified.error ?? "We could not confirm your payment yet.", {
               description: `Order ${result.orderNumber}. If money was debited it will be confirmed automatically or refunded.`,

@@ -3,7 +3,7 @@ import type { SupabaseClient } from "@supabase/supabase-js";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 import type { Database } from "@/integrations/supabase/types";
 
-import type { OrderStatus } from "./order-utils";
+import { escapeCsvCell, type OrderStatus } from "./order-utils";
 
 type AuthContext = { supabase: SupabaseClient<Database>; userId: string };
 
@@ -215,7 +215,6 @@ export const exportOrdersCsv = createServerFn({ method: "POST" })
       "Admin Notes",
     ];
 
-    const escape = (v: unknown) => `"${String(v ?? "").replace(/"/g, '""')}"`;
     const rows = (data ?? []).map((raw) => {
       const o = raw as unknown as Record<string, unknown>;
       const items = (o["order_items"] as Array<Record<string, unknown>> | null) ?? [];
@@ -245,9 +244,9 @@ export const exportOrdersCsv = createServerFn({ method: "POST" })
         o["customer_notes"],
         o["admin_notes"],
       ]
-        .map(escape)
+        .map(escapeCsvCell)
         .join(",");
     });
 
-    return { csv: [headers.map(escape).join(","), ...rows].join("\n") };
+    return { csv: [headers.map(escapeCsvCell).join(","), ...rows].join("\n") };
   });

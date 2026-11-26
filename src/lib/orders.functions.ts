@@ -296,6 +296,14 @@ export const verifyPayment = createServerFn({ method: "POST" })
     }) => data,
   )
   .handler(async ({ data }) => {
+    const orderNumber = data.orderNumber?.trim() ?? "";
+    const razorpayOrderId = data.razorpayOrderId?.trim() ?? "";
+    const razorpayPaymentId = data.razorpayPaymentId?.trim() ?? "";
+    const razorpaySignature = data.razorpaySignature?.trim() ?? "";
+    if (!orderNumber || !razorpayOrderId || !razorpayPaymentId || !razorpaySignature) {
+      return { ok: false as const, error: "Payment verification failed." };
+    }
+
     const { getAdmin, verifyCheckoutSignature, sendOrderConfirmationOnce } = await import(
       "./store.server"
     );
@@ -303,39 +311,45 @@ export const verifyPayment = createServerFn({ method: "POST" })
 
     const { data: row } = await admin
       .from("orders")
-      .select("id, order_number, public_token, gateway_order_id, payment_status")
-      .eq("order_number", data.orderNumber)
-      .single();
+      .select("id, order_number, gateway_order_id, gateway_payment_id, payment_status")
+      .eq("order_number", orderNumber)
+      .maybeSingle();
 
-    if (!row) return { ok: false as const, error: "Order not found." };
+    if (!row) return { ok: false as const, error: "Payment verification failed." };
     const order = row as unknown as {
       id: string;
       order_number: string;
-      public_token: string;
       gateway_order_id: string | null;
+      gateway_payment_id: string | null;
       payment_status: string;
     };
 
-    if (order.payment_status === "paid")
-      return { ok: true as const, token: order.public_token, orderNumber: order.order_number };
-
-    if (!order.gateway_order_id || order.gateway_order_id !== data.razorpayOrderId)
+    if (!order.gateway_order_id || order.gateway_order_id !== razorpayOrderId)
       return { ok: false as const, error: "Payment could not be matched to this order." };
 
     const valid = verifyCheckoutSignature(
-      data.razorpayOrderId,
-      data.razorpayPaymentId,
-      data.razorpaySignature,
+      razorpayOrderId,
+      razorpayPaymentId,
+      razorpaySignature,
     );
     if (!valid) {
-      await admin.from("payments").insert({
-        order_id: order.id,
-        gateway_order_id: data.razorpayOrderId,
-        gateway_payment_id: data.razorpayPaymentId,
-        amount: 0,
-        status: "signature_invalid",
-      });
+      if (order.payment_status !== "paid") {
+        await admin.from("payments").insert({
+          order_id: order.id,
+          gateway_order_id: razorpayOrderId,
+          gateway_payment_id: razorpayPaymentId,
+          amount: 0,
+          status: "signature_invalid",
+        });
+      }
       return { ok: false as const, error: "Payment verification failed." };
+    }
+
+    if (order.payment_status === "paid") {
+      if (order.gateway_payment_id && order.gateway_payment_id !== razorpayPaymentId) {
+        return { ok: false as const, error: "Payment verification failed." };
+      }
+      return { ok: true as const, orderNumber: order.order_number };
     }
 
     await admin
@@ -343,9 +357,9 @@ export const verifyPayment = createServerFn({ method: "POST" })
       .update({
         payment_status: "paid",
         order_status: "confirmed",
-        gateway_payment_id: data.razorpayPaymentId,
-        gateway_signature: data.razorpaySignature,
-        payment_reference: data.razorpayPaymentId,
+        gateway_payment_id: razorpayPaymentId,
+        gateway_signature: razorpaySignature,
+        payment_reference: razorpayPaymentId,
         confirmed_at: new Date().toISOString(),
       })
       .eq("id", order.id);
@@ -353,19 +367,19 @@ export const verifyPayment = createServerFn({ method: "POST" })
     await admin.from("order_status_history").insert({
       order_id: order.id,
       status: "confirmed",
-      note: `Payment verified (${data.razorpayPaymentId})`,
+      note: `Payment verified (${razorpayPaymentId})`,
     });
     await admin.from("payments").insert({
       order_id: order.id,
-      gateway_order_id: data.razorpayOrderId,
-      gateway_payment_id: data.razorpayPaymentId,
+      gateway_order_id: razorpayOrderId,
+      gateway_payment_id: razorpayPaymentId,
       amount: 0,
       status: "verified",
     });
 
     await sendOrderConfirmationOnce(order.id);
 
-    return { ok: true as const, token: order.public_token, orderNumber: order.order_number };
+    return { ok: true as const, orderNumber: order.order_number };
   });
 
 const ORDER_PUBLIC_FIELDS =
