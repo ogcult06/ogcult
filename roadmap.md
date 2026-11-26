@@ -4,10 +4,11 @@
 - (nothing in progress)
 
 ## Done
+- Changed the OG HUSTLER HOODIE selling price to ₹1,199 for every size (S, M, L, XL), keeping the crossed-out ₹4,500 original.
 - Replaced OG HUSTLER's front and back photos and added the supplied full product description, keeping the model and details photos unchanged.
 - Widened all product image frames across cards, product pages, cart, search, checkout, confirmation, and tracking to square frames with full-image fit so every garment and its sleeves appear completely uncropped.
 - Moved OG HUSTLER HOODIE to the first spot in New Drop (and across the store catalogue).
-- Added OG HUSTLER HOODIE to Hoodies at ₹1,150 (MRP ₹4,500), with front, back, model, details photos and sizes S, M, L, XL; verified gallery and add-to-cart on phone and desktop.
+- Added OG HUSTLER HOODIE to Hoodies (MRP ₹4,500), with front, back, model, details photos and sizes S, M, L, XL; verified gallery and add-to-cart on phone and desktop.
 - Replaced the sale headline with OG CULT in Old London lettering and reduced the floating Shop Now pill to a clear, blurred-glass button.
 - Reference-style floating Shop Now pill visible from the homepage banner; smaller discount text and Black Friday line removed.
 - Floating liquid-glass bottom CTA bar ("Shop Now") on the homepage, 16px above the bottom edge.

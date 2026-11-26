@@ -27,10 +27,10 @@ describe("OG HUSTLER catalogue", () => {
   test("original price is INR 4500", async () => {
     expect(Number((await hoodie()).compare_at_price)).toBe(4500);
   });
-  test("sale price is INR 1150 for every variant", async () => {
+  test("sale price is INR 1199 for every variant", async () => {
     const variants = (await hoodie()).product_variants;
     expect(variants.length).toBeGreaterThan(0);
-    for (const variant of variants) expect(Number(variant.price)).toBe(1150);
+    for (const variant of variants) expect(Number(variant.price)).toBe(1199);
   });
   test("images are ordered front, back, model, details", async () => {
     const images = (await hoodie()).images;
