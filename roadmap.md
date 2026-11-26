@@ -1,7 +1,11 @@
 # Roadmap
 
 ## In progress
+- (nothing in progress)
+
+## Done
 - Floating liquid-glass bottom CTA bar ("Shop Now") on the homepage, 16px above the bottom edge.
+- Hero sale title moved above the model's head; bottom of the hero photo cropped.
 
 ## Open
 - Email sending domain for ogcult.store so order confirmation emails reach customers (needs DNS records at the registrar).
