@@ -8,3 +8,5 @@
 > Commits you push to the connected branch sync back to Lovable and show up in
 > the editor, so keep the branch in a working state.
 <!-- LOVABLE:END -->
+
+- Keep homepage floating shopping actions in the shared FloatingShopCta component and style its glass surface with global semantic tokens so the banner and scrolling states stay consistent.

@@ -32,7 +32,7 @@ export const imagery = {
 };
 
 export const home = {
-  heroHeadline: "Grand Theft Black Friday",
+  heroHeadline: "Grand Theft",
   heroSub: "Flat Discount",
   dropTitle: "New drop",
   dropSub: "The latest from OG CULT.",
@@ -46,7 +46,6 @@ export const promoHeroSlides = [
     image: heroImage,
     alt: "OG CULT streetwear promotional campaign model",
     titleTop: "GRAND THEFT",
-    titleMain: "BLACK FRIDAY",
     discount: "70% OFF",
     subtitle: "Flat Discount",
     ctaLabel: "Shop Now",
@@ -55,7 +54,6 @@ export const promoHeroSlides = [
     image: editorialImage,
     alt: "OG CULT midnight collection streetwear campaign",
     titleTop: "MIDNIGHT ARCHIVE",
-    titleMain: "BLACK FRIDAY",
     discount: "70% OFF",
     subtitle: "Flat Discount",
     ctaLabel: "Shop Now",

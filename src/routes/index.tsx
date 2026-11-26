@@ -16,11 +16,11 @@ import catJoggers from "@/assets/cat-joggers.png";
 export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
-      { title: "Streetwear For The Originals" },
+      { title: "OG CULT — Streetwear For The Originals" },
       {
         name: "description",
         content:
-          "OG CULT is premium underground streetwear cut in limited runs. Built for the ones who don't follow. Shop the Black Friday drop.",
+          "OG CULT is premium underground streetwear cut in limited runs. Built for the ones who don't follow. Shop the latest collection.",
       },
       { property: "og:title", content: "OG CULT — Underground Luxury Streetwear" },
       {
@@ -160,7 +160,7 @@ function HomePage() {
         {/* Clickable promotional overlay */}
         <div
           onClick={scrollToDiscountedCollection}
-          className="relative z-10 flex h-full cursor-pointer flex-col items-center justify-between px-12 pt-24 pb-16 text-center md:px-20 md:pt-[6.25rem] md:pb-20"
+          className="relative z-10 flex h-full cursor-pointer flex-col items-center justify-between px-12 pt-24 pb-36 text-center md:px-20 md:pt-[6.25rem] md:pb-36"
         >
           {/* Top — Bold distressed/grunge white display title, clear of the model's head */}
           <header className="max-w-4xl">
@@ -168,30 +168,17 @@ function HomePage() {
               <span className="block text-[clamp(1.8rem,4.8vw,3.5rem)] tracking-[0.06em]">
                 {currentSlide.titleTop}
               </span>
-              <span className="mt-1 block text-[clamp(2.6rem,7.8vw,5.8rem)]">
-                {currentSlide.titleMain}
-              </span>
             </h1>
           </header>
 
           {/* Bottom — Slanted vibrant crimson 70% OFF + Flat Discount + Shop Now */}
           <div className="flex flex-col items-center">
-            <p className="promo-discount text-[clamp(3.75rem,13vw,9.5rem)] text-crimson">
+            <p className="promo-discount text-5xl text-crimson sm:text-6xl md:text-7xl">
               {currentSlide.discount}
             </p>
             <p className="mt-2 font-sans text-xs font-medium tracking-[0.34em] text-bone uppercase sm:text-sm md:text-base">
               {currentSlide.subtitle}
             </p>
-            <button
-              type="button"
-              onClick={(e) => {
-                e.stopPropagation();
-                scrollToDiscountedCollection();
-              }}
-              className="mt-6 border border-bone/80 bg-pitch/55 px-9 py-3.5 font-sans text-[0.7rem] font-semibold tracking-[0.3em] text-bone uppercase backdrop-blur-sm transition-all duration-300 hover:border-crimson hover:bg-crimson hover:text-bone md:mt-7"
-            >
-              {currentSlide.ctaLabel}
-            </button>
           </div>
         </div>
 
@@ -220,7 +207,7 @@ function HomePage() {
         </button>
 
         {/* Centered pagination dots at bottom */}
-        <div className="absolute inset-x-0 bottom-6 z-20 flex items-center justify-center gap-2.5">
+        <div className="absolute inset-x-0 bottom-28 z-20 flex items-center justify-center gap-2.5">
           {promoHeroSlides.map((_, i) => (
             <button
               key={i}

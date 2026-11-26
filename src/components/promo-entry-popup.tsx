@@ -48,7 +48,7 @@ export function PromoEntryPopup({ onShopNow }: { onShopNow: () => void }) {
     <div
       role="dialog"
       aria-modal="true"
-      aria-label={`${slide.titleTop} ${slide.titleMain} — ${slide.discount}`}
+      aria-label={`${slide.titleTop} — ${slide.discount}`}
       className="fixed inset-0 z-[70] flex items-center justify-center bg-pitch/80 p-4 backdrop-blur-sm animate-in fade-in duration-300"
       onClick={dismiss}
     >
@@ -76,11 +76,10 @@ export function PromoEntryPopup({ onShopNow }: { onShopNow: () => void }) {
           <div className="absolute inset-0 flex flex-col items-center justify-between px-6 py-8 text-center">
             <div className="pt-2">
               <p className="promo-grunge text-2xl text-bone sm:text-3xl">{slide.titleTop}</p>
-              <p className="promo-grunge mt-1 text-4xl text-bone sm:text-5xl">{slide.titleMain}</p>
             </div>
 
             <div className="flex flex-col items-center">
-              <p className="promo-discount text-6xl text-crimson sm:text-7xl">{slide.discount}</p>
+              <p className="promo-discount text-4xl text-crimson sm:text-5xl">{slide.discount}</p>
               <p className="mt-2 font-sans text-xs font-medium tracking-[0.3em] text-bone uppercase">
                 {slide.subtitle}
               </p>

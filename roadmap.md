@@ -4,6 +4,7 @@
 - (nothing in progress)
 
 ## Done
+- Reference-style floating Shop Now pill visible from the homepage banner; smaller discount text and Black Friday line removed.
 - Floating liquid-glass bottom CTA bar ("Shop Now") on the homepage, 16px above the bottom edge.
 - Hero sale title moved above the model's head; bottom of the hero photo cropped.
 
