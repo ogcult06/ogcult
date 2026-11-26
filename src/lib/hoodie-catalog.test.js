@@ -41,4 +41,14 @@ describe("OG HUSTLER catalogue", () => {
     expect(product.product_type).toBe("Hoodies");
     expect(product.active).toBe(true);
   });
+  test("product is tagged for New Drop and ordered first in the catalogue", async () => {
+    const { data, error } = await client
+      .from("products")
+      .select("handle, tags, sort_order")
+      .eq("active", true)
+      .order("sort_order", { ascending: true });
+    if (error) throw error;
+    expect(data[0]?.handle).toBe("og-hustler-hoodie");
+    expect(data[0]?.tags.some((t) => /new/i.test(t))).toBe(true);
+  });
 });
