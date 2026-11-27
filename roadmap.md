@@ -4,6 +4,7 @@
 - (nothing in progress)
 
 ## Done
+- Added Culture Code Hoodie to Hoodies (and New Drop) at ₹1,199 (MRP ₹4,500) in sizes S–XL, with the full description and five ordered photos (model back, model front, hoodie back, hoodie front, details).
 - Changed the OG HUSTLER HOODIE selling price to ₹1,199 for every size (S, M, L, XL), keeping the crossed-out ₹4,500 original.
 - Replaced OG HUSTLER's front and back photos and added the supplied full product description, keeping the model and details photos unchanged.
 - Widened all product image frames across cards, product pages, cart, search, checkout, confirmation, and tracking to square frames with full-image fit so every garment and its sleeves appear completely uncropped.
