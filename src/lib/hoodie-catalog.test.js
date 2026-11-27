@@ -37,8 +37,8 @@ describe("OG HUSTLER catalogue", () => {
     expect(variants.map(variant => variant.size).sort()).toEqual(["L", "M", "S", "XL"]);
     for (const variant of variants) expect(variant.available).toBe(true);
   });
-  test("original price is INR 4500", async () => {
-    expect(Number((await hoodie()).compare_at_price)).toBe(4500);
+  test("original price is INR 4499", async () => {
+    expect(Number((await hoodie()).compare_at_price)).toBe(4499);
   });
   test("sale price is INR 1199 for every variant", async () => {
     const variants = (await hoodie()).product_variants;
@@ -66,12 +66,14 @@ describe("OG HUSTLER catalogue", () => {
 });
 
 describe("Culture Code Hoodie catalogue", () => {
-  test("original price is INR 4500 and sale price is INR 1199 for every variant", async () => {
+  test("original price is INR 4999", async () => {
+    expect(Number((await cultureCodeHoodie()).compare_at_price)).toBe(4999);
+  });
+  test("sale price is INR 1249 for every variant", async () => {
     const product = await cultureCodeHoodie();
-    expect(Number(product.compare_at_price)).toBe(4500);
     expect(product.product_variants.length).toBeGreaterThan(0);
     for (const variant of product.product_variants) {
-      expect(Number(variant.price)).toBe(1199);
+      expect(Number(variant.price)).toBe(1249);
       expect(variant.available).toBe(true);
     }
   });
