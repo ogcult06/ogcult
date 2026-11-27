@@ -54,15 +54,14 @@ describe("OG HUSTLER catalogue", () => {
     expect(product.product_type).toBe("Hoodies");
     expect(product.active).toBe(true);
   });
-  test("product is tagged for New Drop and ordered first in the catalogue", async () => {
+  test("product is tagged for New Drop", async () => {
     const { data, error } = await client
       .from("products")
-      .select("handle, tags, sort_order")
-      .eq("active", true)
-      .order("sort_order", { ascending: true });
+      .select("handle, tags")
+      .eq("handle", "og-hustler-hoodie")
+      .single();
     if (error) throw error;
-    expect(data[0]?.handle).toBe("og-hustler-hoodie");
-    expect(data[0]?.tags.some((t) => /new/i.test(t))).toBe(true);
+    expect(data.tags.some((t) => /new/i.test(t))).toBe(true);
   });
 });
 
@@ -93,5 +92,16 @@ describe("Culture Code Hoodie catalogue", () => {
     expect(product.active).toBe(true);
     expect(product.description).toContain("OG CULT – Culture Code Hoodie");
     expect(product.description).toContain("Stay Original. Stay OG.");
+  });
+  test("product is tagged for New Drop and ordered first in the catalogue", async () => {
+    const { data, error } = await client
+      .from("products")
+      .select("handle, tags, sort_order")
+      .eq("active", true)
+      .order("sort_order", { ascending: true });
+    if (error) throw error;
+    expect(data[0]?.handle).toBe("culture-code-hoodie");
+    expect(data[0]?.tags.some((t) => /new/i.test(t))).toBe(true);
+    expect(data[1]?.handle).toBe("og-hustler-hoodie");
   });
 });
